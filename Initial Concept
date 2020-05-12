@@ -1,0 +1,17 @@
+Classes needed:
+1) Staff class
+    - staff_id
+    - unavailable_slot
+    - consecutive_presentation_pref
+    - number_of_attend_days
+    - venue_change_pref
+    
+2) Presentation class
+    - list of staff class
+    - presentation_id
+
+3) Venue class
+    - venue_id
+    - room_type
+    - presentation class
+    - availability
