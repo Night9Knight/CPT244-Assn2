@@ -6,12 +6,37 @@ Classes needed:
     - number_of_attend_days
     - venue_change_pref
     
-2) Presentation class
+2) Venue class
+    - venue_id
+    - venue_type
+    - availability
+    
+3) Presentation class
     - list of staff class
     - presentation_id
+    - assigned_venue
+    
+4) Candidate class
+    - list of Presentation class (118 objects)
+    - fitness function (contains multiple sub-functions for each part of evaluation)
+    - print function?
+    - random function (to assign random unrepeatable venue to each class objects of the list)
 
-3) Venue class
-    - venue_id
-    - room_type
-    - presentation class
-    - availability
+Steps:
+1) Build a list of venue and staff class objects.
+2) Build a list of presentation class objects and assign relevant staff class objects.
+3) Create a list of Candidate class objects. (around 400?)
+4) Call random function in Candidate class to assign random unrepeatable venue to Presentation class list.
+5) Sort the initial Candidate list based on the fitness function
+5) For about 2000 rounds:
+   5.1) Call function to generate next gen:
+        5.1.1) Preserve the 10% of the best genes from the previous generation.
+        5.1.2) While the new generation population size is smaller than 90% of the previous generation:
+               5.1.2.1) Randomly picks 8 genes from the previous generation and put them into 4 groups of evaluation by the fitness value.
+               5.1.2.2) The winner of each group is put into a function to perform uniform crossover (w1 & w4, w2 & w3) and 4 new genes (g1,g2,g3,g4) is formed
+               5.1.2.3) Assign random mutation rate to each new genes and perform mutation if mutation rate is lower than or equal to set mutation rate.
+               5.1.2.4) Mutation to be done through assign different timeslots to each presentation. 
+               5.1.2.5) Compare the fitness value for each pair of old gene and new gene (eg. w1 & g1) and insert the better genes into the new generation population.
+        5.1.3) Sort the new generation population.
+6) Print the best gene in the final population.
+               
