@@ -30,7 +30,7 @@ def staff_record_handler():  # Read all records related to staff
         for row in su_reader:
             for data in range(len(row)):
                 if data > 0:
-                    staff_list[line_count].unavailable_slot.append(row[data])
+                    staff_list[line_count].unavailable_slot.append(int(row[data]))
             line_count += 1
 
     with open('SC01.csv') as consecutive_presentation_file:
@@ -58,8 +58,34 @@ def staff_record_handler():  # Read all records related to staff
 
 
 def venue_record_handler():  # Read all records related to venue
-    print("TBD")
+    venue_list = []  # List of venue
+    w = 0
 
+    for i in range(1, 301):
+        new_venue = Venue()
+        new_venue.venue_id = i
+
+        if i - w * 60 <= 1 and i - w * 60 <= 15:
+            new_venue.venue_type = "VR"
+        elif i - w * 60 <= 16 and i - w * 60 <= 30:
+            new_venue.venue_type = "MR"
+        elif i - w * 60 <= 31 and i - w * 60 <= 45:
+            new_venue.venue_type = "IR"
+        else:
+            new_venue.venue_type = "BJIM"
+            if i - w * 60 == 60:
+                w += 1
+        venue_list.append(new_venue)
+
+    with open("HC03.csv") as venue_unavailable_file:
+        vu_reader = csv.reader(venue_unavailable_file, delimiter=",")
+
+        for row in vu_reader:
+            for data in range(len(row)):
+                if data > 0:
+                    venue_list[int(row[data]) - 1].availability = False
+
+    return venue_list
 
 
 class Presentation:
