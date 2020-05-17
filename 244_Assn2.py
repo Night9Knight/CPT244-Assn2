@@ -69,11 +69,11 @@ def venue_record_handler():  # Read all records related to venue
         new_venue = Venue()
         new_venue.venue_id = i
 
-        if i - w * 60 <= 1 and i - w * 60 <= 15:
+        if 1 <= i - w * 60 <= 15:
             new_venue.venue_type = "VR"
-        elif i - w * 60 <= 16 and i - w * 60 <= 30:
+        elif 16 <= i - w * 60 <= 30:
             new_venue.venue_type = "MR"
-        elif i - w * 60 <= 31 and i - w * 60 <= 45:
+        elif 31 <= i - w * 60 <= 45:
             new_venue.venue_type = "IR"
         else:
             new_venue.venue_type = "BJIM"
@@ -110,7 +110,7 @@ class Candidate:
                 if line_count > 0:
                     new_presentation = Presentation()
                     new_presentation.presentation_id = row[0]
-                    for data in range(1, 3):
+                    for data in range(1, 4):
                         new_presentation.staff_list.append(self.staff_list[row[data]])
                     self.presentation_list.append(new_presentation)
                 line_count += 1
@@ -155,4 +155,11 @@ class GeneticAlgorithm:
         print("TBD")
 
 
-result = GeneticAlgorithm()
+# result = GeneticAlgorithm()
+venue_run = venue_record_handler()
+for item in venue_run:
+    print(item.venue_id, item.venue_type, item.availability)
+
+staff_run = staff_record_handler()
+for record in staff_run:
+    print(staff_run[record].staff_id,staff_run[record].attend_day,staff_run[record].unavailable_slot,staff_run[record].same_venue_pref,staff_run[record].consecutive_presentation_pref)
