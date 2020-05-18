@@ -125,7 +125,7 @@ class Candidate:
     def __init__(self):
         self.presentation_list = []
         self.SIZE = 118
-        self.random_venue_list = []
+        self.random_venue_list = [None] * self.SIZE
         self.staff_list = staff_record_handler()
         with open("SupExaAssign.csv") as SupExaAssign:
             sea_reader = csv.reader(SupExaAssign, delimiter=",")
@@ -141,11 +141,9 @@ class Candidate:
                 line_count += 1
 
     def randomize_venue(self, venue_list):
-        for presentation in self.presentation_list:
-            r = random.randint(1, 300)
-            if presentation.assigned_venue.venue_id != r and r not in self.random_venue_list:
-                self.random_venue_list.append(r)
-                presentation.assigned_venue = venue_list[r - 1]
+        self.random_venue_list = random.sample(range(300), 118)
+        for i in range(self.SIZE):
+            self.presentation_list[i].assigned_venue = venue_list[self.random_venue_list[i]]
 
     def fitness(self):
         print("TBD")
@@ -237,10 +235,11 @@ class GeneticAlgorithm:
         i = random.randint(0, obj.SIZE)
         j = random.randint(1, 300)
 
-        while obj.presentation_list[i].assigned_venue.venue_id == j or j in obj.random_venue_list:
+        while j in obj.random_venue_list:
             j = random.randint(1, 300)
 
-        obj.presentation_list[i].assigned_venue = self.venue_list[j-1]
+        obj.random_venue_list[i] = j  # Update the venue occupied by the chosen presentation
+        obj.presentation_list[i].assigned_venue = self.venue_list[j-1]  # Update new venue for chosen presentation
 
     def run(self):
         max_steps = 10000
