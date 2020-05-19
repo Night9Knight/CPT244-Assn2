@@ -168,6 +168,7 @@ class Candidate:
     def __init__(self):
         self.presentation_list = []
         self.SIZE = 118
+        self.total_fitness = 0
         self.random_venue_list = []
         self.staff_list = staff_record_handler()
         with open("SupExaAssign.csv") as SupExaAssign:
@@ -197,7 +198,7 @@ class Candidate:
         for i in range(3):
             self.presentation_list[i].print()
             if self.presentation_list[i].assigned_venue.availability == False:
-                total_fitness += 1000
+                self.total_fitness += 1000
 
         attended_days = []
         # for staff in self.staff_list:
@@ -208,24 +209,25 @@ class Candidate:
         #                 attended_days.append(presentation.assigned_venue.day)
         #                 if len(attended_days) > int(self.staff_list.get(staff).attend_day):
         #                     total_fitness += 10
-        print("Fitness : " + str(total_fitness))
-        return total_fitness
+        #print("Fitness : " + str(self.total_fitness))
+        return self.total_fitness
 
     def print(self):
-        print("TBD")
+        print("Fitness : " + str(self.total_fitness))
 
 
 class GeneticAlgorithm:
     def __init__(self):
         self.population = []  # List of candidates
-        self.pop_size = 3
+        self.pop_size = 9
         self.parent_use_percent = 10.0
         self.venue_list = venue_record_handler()
-        new_candidate = Candidate()
         for i in range(self.pop_size):
+            new_candidate = Candidate()
             new_candidate.randomize_venue(self.venue_list)
             self.population.append(new_candidate)
         self.population = sorted(self.population, key=lambda candidate: candidate.fitness())  # Sort the population
+    
 
     # def generate_new_gen(self):
     #     new_pop = []
