@@ -149,7 +149,12 @@ class Candidate:
         print("TBD")
 
     def print(self):
-        print("TBD")
+        a = 0
+        for p in self.presentation_list:
+            if not p.assigned_venue.availability:
+                a += 1000
+        print(self.random_venue_list)
+        print("Fitness: ", a)
 
 
 class GeneticAlgorithm:
@@ -162,7 +167,7 @@ class GeneticAlgorithm:
         for i in range(self.pop_size):
             new_candidate.randomize_venue(self.venue_list)
             self.population.append(new_candidate)
-        self.population = sorted(self.population, key=lambda candidate: candidate.fitness())  # Sort the population
+        # self.population = sorted(self.population, key=lambda candidate: candidate.fitness())  # Sort the population
 
     def generate_new_gen(self):
         new_pop = []
@@ -239,7 +244,7 @@ class GeneticAlgorithm:
             j = random.randint(1, 300)
 
         obj.random_venue_list[i] = j  # Update the venue occupied by the chosen presentation
-        obj.presentation_list[i].assigned_venue = self.venue_list[j-1]  # Update new venue for chosen presentation
+        obj.presentation_list[i].assigned_venue = self.venue_list[j - 1]  # Update new venue for chosen presentation
 
     def run(self):
         max_steps = 10000
@@ -256,3 +261,6 @@ staff_run = staff_record_handler()
 for record in staff_run:
     print(staff_run[record].staff_id, staff_run[record].attend_day, staff_run[record].unavailable_slot,
           staff_run[record].same_venue_pref, staff_run[record].consecutive_presentation_pref)
+
+run = GeneticAlgorithm()
+run.population[0].print()
