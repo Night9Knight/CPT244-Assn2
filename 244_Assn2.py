@@ -163,11 +163,11 @@ class GeneticAlgorithm:
         self.pop_size = 400
         self.parent_use_percent = 10.0
         self.venue_list = venue_record_handler()
-        new_candidate = Candidate()
         for i in range(self.pop_size):
+            new_candidate = Candidate()
             new_candidate.randomize_venue(self.venue_list)
             self.population.append(new_candidate)
-        # self.population = sorted(self.population, key=lambda candidate: candidate.fitness())  # Sort the population
+        self.population = sorted(self.population, key=lambda candidate: candidate.fitness())  # Sort the population
 
     def generate_new_gen(self):
         new_pop = []
