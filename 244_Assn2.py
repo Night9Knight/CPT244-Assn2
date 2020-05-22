@@ -65,12 +65,7 @@ def staff_record_handler():  # Read all records related to staff
 
 def venue_record_handler():  # Read all records related to venue
     venue_list = []  # List of venue
-    days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-    time_of_day = ["0900-0930", "0930-1000", "1000-1030", "1030-1100", "1100-1130", "1130-1200", "1200-1230",
-                   "1230-1300", "1400-1430", "1430-1500", "1500-1530", "1530-1600", "1600-1630", "1630-1700",
-                   "1700-1730"]
     w = 0
-    z = 0
 
     for i in range(1, 301):
         new_venue = Venue()
@@ -78,29 +73,17 @@ def venue_record_handler():  # Read all records related to venue
 
         if 1 <= i - w * 60 <= 15:
             new_venue.venue_type = "VR"
-            new_venue.day = days_of_week[w]
-            new_venue.time = time_of_day[z]
-            z += 1
         elif 16 <= i - w * 60 <= 30:
             new_venue.venue_type = "MR"
-            new_venue.day = days_of_week[w]
-            new_venue.time = time_of_day[z]
-            z += 1
         elif 31 <= i - w * 60 <= 45:
             new_venue.venue_type = "IR"
-            new_venue.day = days_of_week[w]
-            new_venue.time = time_of_day[z]
-            z += 1
         else:
             new_venue.venue_type = "BJIM"
-            new_venue.day = days_of_week[w]
-            new_venue.time = time_of_day[z]
-            z += 1
             if i - w * 60 == 60:
                 w += 1
 
-        if z == 15:
-            z = 0
+        new_venue.day = (i - 1) / 60  # stores the day as int (Mon - Fri : 0 - 4)
+        new_venue.time = i % 15  # stores the time as int (0900-0930.....1700-1730: 0.....14)
 
         venue_list.append(new_venue)
 
@@ -122,11 +105,12 @@ class Presentation:
 
 
 class Candidate:
-    def __init__(self):
+    def __init__(self, s_list):
         self.presentation_list = []
         self.SIZE = 118
         self.random_venue_list = [None] * self.SIZE
-        self.staff_list = staff_record_handler()
+        self.staff_list = s_list
+
         with open("SupExaAssign.csv") as SupExaAssign:
             sea_reader = csv.reader(SupExaAssign, delimiter=",")
             line_count = 0
@@ -146,7 +130,77 @@ class Candidate:
             self.presentation_list[i].assigned_venue = venue_list[self.random_venue_list[i]]
 
     def fitness(self):
-        print("TBD")
+        venue_presentation = {}
+        for i in range(self.SIZE):
+            venue_presentation[self.random_venue_list[i]] = self.presentation_list[i]
+
+        total_fitness = 0
+        self.presentation_list.sort(key=lambda p: p.assigned_venue.venue_id)
+        for presentation in self.presentation_list:
+            # HC02 : check whether the venue is available or not
+            if not presentation.assigned_venue.availability:
+                total_fitness += 1000
+
+            for staff in presentation.staff_list:
+                # HC03 : check whether the staff is unavailable for the assigned slot
+                if presentation.assigned_venue.venue_id in staff.unavailable_slot:
+                    total_fitness += 1000
+
+                # HC04 : checking whether the staff exists in other presentations' staff list
+                # that is in a slot that has the same time and day
+                for i in range(4):
+                    same_time_venue_id = presentation.assigned_venue.day * 60 + i * 15 + presentation.assigned_venue.time  # gets venue_id of presentations with same time and day
+                    other_presentation = venue_presentation.get(
+                        same_time_venue_id)  # refers venue_presentation dictionary to obtain the respective presentation
+                    if other_presentation and other_presentation.presentation_id != presentation.presentation_id:
+                        if staff in other_presentation.staff_list:
+                            total_fitness += 1000
+
+        attended_days = []
+        for key in self.staff_list:
+            staff = self.staff_list.get(key)
+            attended_days.clear()
+            consecutive_presentation = staff.consecutive_presentation_pref
+            other_presentation = None
+
+            for presentation in self.presentation_list:
+
+                if staff in presentation.staff_list:
+                    previous_time_slot = presentation.assigned_venue.time - 1  # stores the time slot of the previous
+                    # venue id
+
+                    # SC01 and SC03
+                    if presentation.assigned_venue.time != 1:  # presentation is not the first one for the day
+                        for i in range(4):
+                            # get all presentations that uses the time slot before the current presentation
+                            previous_venue_id = presentation.assigned_venue.day * 60 + i * 15 + previous_time_slot
+                            other_presentation = venue_presentation.get(previous_venue_id)
+
+                            # runs when other_presentation points towards a presentation occupying the previous time slot
+                            if other_presentation:
+                                if staff in other_presentation.staff_list:
+                                    consecutive_presentation = int(consecutive_presentation) - 1
+
+                                    if consecutive_presentation < 0:
+                                        total_fitness += 10
+
+                                    if staff.same_venue_pref == "yes":
+                                        if other_presentation.assigned_venue.venue_type != presentation.assigned_venue.venue_type:
+                                            total_fitness += 10
+                                else:
+                                    consecutive_presentation = staff.consecutive_presentation_pref
+                            else:
+                                consecutive_presentation = staff.consecutive_presentation_pref
+
+                    # SC02 : check whether the number of presentation days exceed the number of preferred days of the staff
+                    if presentation.assigned_venue.day not in attended_days:
+                        if len(attended_days) < int(staff.attend_day):
+                            attended_days.append(presentation.assigned_venue.day)
+                        else:
+                            total_fitness += 10
+
+        #print("Fitness : " + str(total_fitness))
+        return total_fitness
 
     def print(self):
         a = 0
@@ -162,9 +216,10 @@ class GeneticAlgorithm:
         self.population = []  # List of candidates
         self.pop_size = 400
         self.parent_use_percent = 10.0
+        self.staff_list = staff_record_handler()
         self.venue_list = venue_record_handler()
         for i in range(self.pop_size):
-            new_candidate = Candidate()
+            new_candidate = Candidate(self.staff_list)
             new_candidate.randomize_venue(self.venue_list)
             self.population.append(new_candidate)
         self.population = sorted(self.population, key=lambda candidate: candidate.fitness())  # Sort the population
@@ -221,8 +276,8 @@ class GeneticAlgorithm:
         self.population = sorted(new_pop, key=lambda candidate: candidate.fitness())
 
     def uniform_crossover(self, c1, c2):
-        obj = Candidate()
-        obj2 = Candidate()
+        obj = Candidate(self.staff_list)
+        obj2 = Candidate(self.staff_list)
 
         for i in range(obj.SIZE):
             b = random.random() >= 0.5
@@ -237,7 +292,7 @@ class GeneticAlgorithm:
         return obj, obj2
 
     def mutate(self, obj):
-        i = random.randint(0, obj.SIZE)
+        i = random.randint(0, obj.SIZE-1)
         j = random.randint(1, 300)
 
         while j in obj.random_venue_list:
@@ -247,20 +302,26 @@ class GeneticAlgorithm:
         obj.presentation_list[i].assigned_venue = self.venue_list[j - 1]  # Update new venue for chosen presentation
 
     def run(self):
-        max_steps = 10000
+        max_steps = 50
         for i in range(max_steps):
+            print("Processing Generation ", i + 1, "/", max_steps)
             self.generate_new_gen()
+            self.population[0].print()
+            print("Fitness: ", self.population[0].fitness())
+        print("Done!!!")
+        print("Best arrangement are:")
+        self.population[0].print()
+        print("Fitness: ", self.population[0].fitness())
 
 
 # result = GeneticAlgorithm()
-venue_run = venue_record_handler()
-for item in venue_run:
-    print(item.venue_id, item.venue_type, item.availability, item.day, item.time)
+# venue_run = venue_record_handler()
+# for item in venue_run:
+#   print(item.venue_id, item.venue_type, item.availability, item.day, item.time)
 
-staff_run = staff_record_handler()
-for record in staff_run:
-    print(staff_run[record].staff_id, staff_run[record].attend_day, staff_run[record].unavailable_slot,
-          staff_run[record].same_venue_pref, staff_run[record].consecutive_presentation_pref)
-
-run = GeneticAlgorithm()
-run.population[0].print()
+# staff_run = staff_record_handler()
+# for record in staff_run:
+#   print(staff_run[record].staff_id, staff_run[record].attend_day, staff_run[record].unavailable_slot,
+#        staff_run[record].same_venue_pref, staff_run[record].consecutive_presentation_pref)
+GeneticAlgorithm().run()
+# run.population[0].print()
