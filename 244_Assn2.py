@@ -149,9 +149,11 @@ class Candidate:
                 # HC04 : checking whether the staff exists in other presentations' staff list
                 # that is in a slot that has the same time and day
                 for i in range(4):
-                    same_time_venue_id = presentation.assigned_venue.day * 60 + i * 15 + presentation.assigned_venue.time  # gets venue_id of presentations with same time and day
+                    # gets venue_id of presentations with same time and day
+                    same_time_venue_id = presentation.assigned_venue.day * 60 + i * 15 + presentation.assigned_venue.time
                     other_presentation = venue_presentation.get(
-                        same_time_venue_id)  # refers venue_presentation dictionary to obtain the respective presentation
+                        same_time_venue_id)  # refers venue_presentation dictionary to obtain the respective
+                    # presentation
                     if other_presentation and other_presentation.presentation_id != presentation.presentation_id:
                         if staff in other_presentation.staff_list:
                             total_fitness += 1000
@@ -166,8 +168,8 @@ class Candidate:
             for presentation in self.presentation_list:
 
                 if staff in presentation.staff_list:
-                    previous_time_slot = presentation.assigned_venue.time - 1  # stores the time slot of the previous
-                    # venue id
+                    # stores the modulus 15 value of the previous venue id
+                    previous_time_slot = presentation.assigned_venue.time - 1
 
                     # SC01 and SC03
                     if presentation.assigned_venue.time != 1:  # presentation is not the first one for the day
@@ -192,23 +194,27 @@ class Candidate:
                             else:
                                 consecutive_presentation = staff.consecutive_presentation_pref
 
-                    # SC02 : check whether the number of presentation days exceed the number of preferred days of the staff
+                    # SC02 : check whether the number of presentation days exceed the number of prefered days of the staff
                     if presentation.assigned_venue.day not in attended_days:
                         if len(attended_days) < int(staff.attend_day):
                             attended_days.append(presentation.assigned_venue.day)
                         else:
                             total_fitness += 10
 
-        #print("Fitness : " + str(total_fitness))
+        # print("Fitness : " + str(total_fitness))
         return total_fitness
 
     def print(self):
-        a = 0
-        for p in self.presentation_list:
-            if not p.assigned_venue.availability:
-                a += 1000
-        print(self.random_venue_list)
-        print("Fitness: ", a)
+        for presentation in self.presentation_list:
+            print("/////////////////////")
+            print("Presentation ID : " + str(presentation.presentation_id))
+            print("Venue ID : " + str(presentation.assigned_venue.venue_id))
+            staffs = ""
+            for staff in presentation.staff_list:
+                staffs += str(staff.staff_id)
+                staffs += " "
+            print("Staffs : " + staffs)
+        print("/////////////////////")
 
 
 class GeneticAlgorithm:
@@ -292,7 +298,7 @@ class GeneticAlgorithm:
         return obj, obj2
 
     def mutate(self, obj):
-        i = random.randint(0, obj.SIZE-1)
+        i = random.randint(0, obj.SIZE - 1)
         j = random.randint(1, 300)
 
         while j in obj.random_venue_list:
@@ -302,7 +308,7 @@ class GeneticAlgorithm:
         obj.presentation_list[i].assigned_venue = self.venue_list[j - 1]  # Update new venue for chosen presentation
 
     def run(self):
-        max_steps = 50
+        max_steps = 10
         for i in range(max_steps):
             print("Processing Generation ", i + 1, "/", max_steps)
             self.generate_new_gen()
@@ -323,5 +329,6 @@ class GeneticAlgorithm:
 # for record in staff_run:
 #   print(staff_run[record].staff_id, staff_run[record].attend_day, staff_run[record].unavailable_slot,
 #        staff_run[record].same_venue_pref, staff_run[record].consecutive_presentation_pref)
+
 GeneticAlgorithm().run()
 # run.population[0].print()
