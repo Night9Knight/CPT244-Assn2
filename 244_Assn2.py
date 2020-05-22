@@ -127,7 +127,7 @@ class Candidate:
         self.SIZE = 118
         self.random_venue_list = [None] * self.SIZE
         self.staff_list = staff_record_handler()
-        self.venue_presentation = {}
+
 
         with open("SupExaAssign.csv") as SupExaAssign:
             sea_reader = csv.reader(SupExaAssign, delimiter=",")
@@ -146,94 +146,80 @@ class Candidate:
         self.random_venue_list = random.sample(range(300), 118)
         for i in range(self.SIZE):
             self.presentation_list[i].assigned_venue = venue_list[self.random_venue_list[i]]
-            self.venue_presentation[self.random_venue_list[i]] = self.presentation_list[i]
-
-        self.presentation_list.sort(key=lambda presentation: presentation.assigned_venue.venue_id)
 
     def fitness(self):
-        total_fitness = 0
-        for presentation in self.presentation_list:
+        venue_presentation = {}
+        for i in range(self.SIZE):
+            venue_presentation[self.random_venue_list[i]] = self.presentation_list[i]
 
-            # one day has 60 presentations
-            day_category = presentation.assigned_venue.venue_id / 60
-            # each day, all venues have 15 presentation
-            same_time_category = presentation.assigned_venue.venue_id % 15
-            # HC02
+        total_fitness = 0
+        self.presentation_list.sort(key=lambda presentation: presentation.assigned_venue.venue_id)
+        for presentation in self.presentation_list:
+            day_category = presentation.assigned_venue.venue_id / 60                             # stores the day as int (Mon - Fri : 0 - 4)
+            same_time_category = presentation.assigned_venue.venue_id % 15                       # stores the modulues 15 value of current venue id
+
+            # HC02 : check whether the venue is available or not
             if presentation.assigned_venue.availability == False:
                 total_fitness += 1000
 
             for staff in presentation.staff_list:
-                # HC03
+                # HC03 : check whether the staff is unavailable for the assigned slot
                 if presentation.assigned_venue.venue_id in staff.unavailable_slot:
                     total_fitness += 1000
 
                 # HC04 : checking whether the staff exists in other presentations' staff list
-                # that has the same time and day
-                # using the venue_presentation dictionary, we can identify the presentations having the same time and
-                # day
+                # that is in a slot that has the same time and day
                 for i in range(4):
-                    current_venue_id = day_category * 60 + i * 15 + same_time_category
-                    other_presentation = self.venue_presentation.get(current_venue_id)
+                    same_time_venue_id = day_category * 60 + i * 15 + same_time_category       # gets venue_id of presentations with same time and day
+                    other_presentation = venue_presentation.get(same_time_venue_id)            # refers venue_presentation dictionary to obtain the respective presentation
                     if other_presentation and other_presentation.presentation_id != presentation.presentation_id:
                         if staff in other_presentation.staff_list:
                             total_fitness += 1000
-
-                # for other_presentation in self.presentation_list:
-                #     if other_presentation.presentation_id != presentation.presentation_id:
-                #         # checking if the same staff in this presentation exists in other presentations
-                #         if staff in other_presentation.staff_list:
-                #
-                #             if other_presentation.assigned_venue.time == presentation.assigned_venue.time and other_presentation.assigned_venue.day == presentation.assigned_venue.day:
-                #                 total_fitness += 1000
-
-                # if before_presentation:
-                #     if staff in before_presentation.staff_list:
-                #         if before_presentation.assigned_venue.venue_id == presentation.assigned_venue.venue_id - 1:
-                #             staff.consecutive_presentation_pref = int(staff.consecutive_presentation_pref) - 1
-                #             if staff.consecutive_presentation_pref <= 0:
-                #                 total_fitness += 10
-                #
-                #             if staff.same_venue_pref == "yes":
-                #                 if before_presentation.assigned_venue.venue_type != presentation.assigned_venue.venue_type:
-                #                     total_fitness += 10
 
         attended_days = []
         for key in self.staff_list:
             staff = self.staff_list.get(key)
             attended_days.clear()
-            line_num = 0
-            before_presentation = None
             consecutive_presentation = staff.consecutive_presentation_pref
+            other_presentation = None
 
             for presentation in self.presentation_list:
-                if line_num:
-                    before_presentation = self.presentation_list[line_num - 1]
 
-                # SC01 and SC03
-                # the following code runs when before_presentation points towards the presentation
-                # occupying the time slot right before the current presentation
-                if before_presentation:
-                    if staff in before_presentation.staff_list and staff in presentation.staff_list:
-                        consecutive_presentation = int(consecutive_presentation) - 1
-
-                        if consecutive_presentation < 0:
-                            total_fitness += 10
-
-                        if staff.same_venue_pref == "yes":
-                            if before_presentation.assigned_venue.venue_type != presentation.assigned_venue.venue_type:
-                                total_fitness += 10
-
-                    else:
-                        consecutive_presentation = staff.consecutive_presentation_pref
-
-                # SC02
                 if staff in presentation.staff_list:
+                    day_category = int(presentation.assigned_venue.venue_id) / 60                       # stores the day as int (Mon - Fri : 0 - 4)
+                    same_time_category = presentation.assigned_venue.venue_id % 15                      # stores the modulues 15 value of current venue id
+                    previous_time_slot = same_time_category - 1                                         # stores the modulus 15 value of the previous venue id
+
+                    # SC01 and SC03
+                    if same_time_category != 1:                                                         # presentation is not the first one for the day
+                        for i in range(4):
+                            # get all presentations that uses the time slot before the current presentation
+                            previous_venue_id = day_category * 60 + i * 15 + previous_time_slot
+                            other_presentation = venue_presentation.get(previous_venue_id)
+
+                            # runs when other_presentation points towards a presentation occupying the previous time slot
+                            if other_presentation:
+                                if staff in other_presentation.staff_list:
+                                    consecutive_presentation = int(consecutive_presentation) - 1
+
+                                    if consecutive_presentation < 0:
+                                        total_fitness += 10
+
+                                    if staff.same_venue_pref == "yes":
+                                        if other_presentation.assigned_venue.venue_type != presentation.assigned_venue.venue_type:
+                                            total_fitness += 10
+                                else:
+                                    consecutive_presentation = staff.consecutive_presentation_pref
+                            else:
+                                consecutive_presentation = staff.consecutive_presentation_pref
+
+                    # SC02 : check whether the number of presentation days exceed the number of prefered days of the staff
                     if presentation.assigned_venue.day not in attended_days:
-                        attended_days.append(presentation.assigned_venue.day)
-                        if len(attended_days) > int(staff.attend_day):
+                        if len(attended_days) < int(staff.attend_day):
+                            attended_days.append(presentation.assigned_venue.day)
+                        else:
                             total_fitness += 10
 
-                line_num += 1
         print("Fitness : " + str(total_fitness))
         return total_fitness
 
