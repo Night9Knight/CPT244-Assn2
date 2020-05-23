@@ -137,7 +137,7 @@ class Candidate:
         for i in range(self.SIZE):
             venue_presentation[self.random_venue_list[i]] = self.presentation_list[i]
 
-        self.presentation_list.sort(key=lambda p: p.assigned_venue.venue_id)
+        #self.presentation_list.sort(key=lambda p: p.assigned_venue.venue_id)
         for presentation in self.presentation_list:
             list_of_presentation_id.append(presentation.presentation_id)
 
@@ -263,7 +263,7 @@ class GeneticAlgorithm:
             child1 = childs[0]
             child2 = childs[1]
 
-            mutate_percent = 0.01
+            mutate_percent = 0.05
             m1 = random.random() <= mutate_percent
             m2 = random.random() <= mutate_percent
 
@@ -342,33 +342,33 @@ class GeneticAlgorithm:
 
         # Assign random unexisting venue if there are still presentation without any venue.
         for x in range(len(temp)):
-            j = random.randint(1, 300)
+            j = random.randint(0, 299)
             while j in obj.random_venue_list:
-                j = random.randint(1, 300)
-            obj.presentation_list[temp[x][0]].assigned_venue = self.venue_list[j-1]
+                j = random.randint(0, 299)
+            obj.presentation_list[temp[x][0]].assigned_venue = self.venue_list[j]
             obj.random_venue_list[temp[x][0]] = j
 
         for x in range(len(temp2)):
-            j = random.randint(1, 300)
+            j = random.randint(0, 299)
             while j in obj2.random_venue_list:
-                j = random.randint(1, 300)
-            obj2.presentation_list[temp2[x][0]].assigned_venue = self.venue_list[j - 1]
+                j = random.randint(0, 299)
+            obj2.presentation_list[temp2[x][0]].assigned_venue = self.venue_list[j]
             obj2.random_venue_list[temp2[x][0]] = j
 
         return obj, obj2
 
     def mutate(self, obj):
         i = random.randint(0, obj.SIZE - 1)
-        j = random.randint(1, 300)
+        j = random.randint(0, 299)
 
         while j in obj.random_venue_list:
-            j = random.randint(1, 300)
+            j = random.randint(0, 299)
 
         obj.random_venue_list[i] = j  # Update the venue occupied by the chosen presentation
-        obj.presentation_list[i].assigned_venue = self.venue_list[j - 1]  # Update new venue for chosen presentation
+        obj.presentation_list[i].assigned_venue = self.venue_list[j]  # Update new venue for chosen presentation
 
     def run(self):
-        max_steps = 10
+        max_steps = 100
         for i in range(max_steps):
             print("Processing Generation ", i + 1, "/", max_steps)
             self.generate_new_gen()
