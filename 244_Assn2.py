@@ -83,7 +83,7 @@ def venue_record_handler():  # Read all records related to venue
                 w += 1
 
         new_venue.day = (i - 1) / 60  # stores the day as int (Mon - Fri : 0 - 4)
-        new_venue.time = i % 15  # stores the time as int (0900-0930.....1700-1730: 0.....14)
+        new_venue.time = (i - 1) % 15  # stores the time as int (0900-0930.....1700-1730: 0.....14)
 
         venue_list.append(new_venue)
 
@@ -137,23 +137,22 @@ class Candidate:
         total_fitness = 0
         self.presentation_list.sort(key=lambda p: p.assigned_venue.venue_id)
         for presentation in self.presentation_list:
-            # HC02 : check whether the venue is available or not
+            # HC03 : check whether the venue is available or not
             if not presentation.assigned_venue.availability:
                 total_fitness += 1000
 
             for staff in presentation.staff_list:
-                # HC03 : check whether the staff is unavailable for the assigned slot
+                # HC04 : check whether the staff is unavailable for the assigned slot
                 if presentation.assigned_venue.venue_id in staff.unavailable_slot:
                     total_fitness += 1000
 
-                # HC04 : checking whether the staff exists in other presentations' staff list
+                # HC02 : checking whether the staff exists in other presentations' staff list
                 # that is in a slot that has the same time and day
                 for i in range(4):
                     # gets venue_id of presentations with same time and day
                     same_time_venue_id = presentation.assigned_venue.day * 60 + i * 15 + presentation.assigned_venue.time
-                    other_presentation = venue_presentation.get(
-                        same_time_venue_id)  # refers venue_presentation dictionary to obtain the respective
-                    # presentation
+                    # refers venue_presentation dictionary to obtain the respective presentation
+                    other_presentation = venue_presentation.get(same_time_venue_id)
                     if other_presentation and other_presentation.presentation_id != presentation.presentation_id:
                         if staff in other_presentation.staff_list:
                             total_fitness += 1000
@@ -168,11 +167,12 @@ class Candidate:
             for presentation in self.presentation_list:
 
                 if staff in presentation.staff_list:
-                    # stores the modulus 15 value of the previous venue id
-                    previous_time_slot = presentation.assigned_venue.time - 1
+                    if presentation.assigned_venue.time > 0:  # presentation is not the first one for the day
+                        # stores the modulus 15 value of the previous venue id
+                        previous_time_slot = presentation.assigned_venue.time - 1
 
                     # SC01 and SC03
-                    if presentation.assigned_venue.time != 1:  # presentation is not the first one for the day
+                    if presentation.assigned_venue.time != 0:  # presentation is not the first one for the day
                         for i in range(4):
                             # get all presentations that uses the time slot before the current presentation
                             previous_venue_id = presentation.assigned_venue.day * 60 + i * 15 + previous_time_slot
