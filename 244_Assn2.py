@@ -130,13 +130,17 @@ class Candidate:
             self.presentation_list[i].assigned_venue = venue_list[self.random_venue_list[i]]
 
     def fitness(self):
-        venue_presentation = {}
-        for i in range(self.SIZE):
-            venue_presentation[self.random_venue_list[i]] = self.presentation_list[i]
-
         total_fitness = 0
+        venue_presentation = {}
+        list_of_presentation_id = []
+
+        for i in range(self.SIZE):
+            venue_presentation[self.presentation_list[i].assigned_venue.venue_id] = self.presentation_list[i]
+
         self.presentation_list.sort(key=lambda p: p.assigned_venue.venue_id)
         for presentation in self.presentation_list:
+            list_of_presentation_id.append(presentation.presentation_id)
+
             # HC03 : check whether the venue is available or not
             if not presentation.assigned_venue.availability:
                 total_fitness += 1000
@@ -200,6 +204,11 @@ class Candidate:
                             attended_days.append(presentation.assigned_venue.day)
                         else:
                             total_fitness += 10
+
+        #HC01 : A presentation is scheduled more than once
+        if(len(list_of_presentation_id)) > len(set(list_of_presentation_id)):
+            num_of_duplicates = len(list_of_presentation_id) - len(set(list_of_presentation_id))
+            total_fitness += (num_of_duplicates * 1000)
 
         # print("Fitness : " + str(total_fitness))
         return total_fitness
