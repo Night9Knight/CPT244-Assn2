@@ -1,5 +1,7 @@
 import csv
 import random
+from tqdm import trange
+from colorama import Fore
 
 
 class Staff:
@@ -137,7 +139,7 @@ class Candidate:
         for i in range(self.SIZE):
             venue_presentation[self.random_venue_list[i]] = self.presentation_list[i]
 
-        #self.presentation_list.sort(key=lambda p: p.assigned_venue.venue_id)
+        # self.presentation_list.sort(key=lambda p: p.assigned_venue.venue_id)
         for presentation in self.presentation_list:
             list_of_presentation_id.append(presentation.presentation_id)
 
@@ -368,15 +370,20 @@ class GeneticAlgorithm:
         obj.presentation_list[i].assigned_venue = self.venue_list[j]  # Update new venue for chosen presentation
 
     def run(self):
-        max_steps = 100
-        for i in range(max_steps):
-            print("Processing Generation ", i + 1, "/", max_steps)
+        max_steps = 10
+
+        pbar = trange(1, max_steps + 1, bar_format="{l_bar}%s{bar}%s{r_bar}" % (Fore.WHITE, Fore.RESET))
+        for item in pbar:
+            pass
+            pbar.set_description("Processing Generation %d" % item)
             self.generate_new_gen()
-            self.population[0].print()
-            print("Fitness: ", self.population[0].fitness())
+
         print("Done!!!")
+        result_list = [None]*300
+        for presentation in self.population[0].presentation_list:
+            result_list[presentation.assigned_venue.venue_id-1] = presentation.presentation_id
         print("Best arrangement are:")
-        self.population[0].print()
+        print(result_list)
         print("Fitness: ", self.population[0].fitness())
 
 
