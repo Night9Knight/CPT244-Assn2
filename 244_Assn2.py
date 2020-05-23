@@ -135,9 +135,8 @@ class Candidate:
         list_of_presentation_id = []
 
         for i in range(self.SIZE):
-            venue_presentation[self.presentation_list[i].assigned_venue.venue_id] = self.presentation_list[i]
+            venue_presentation[self.random_venue_list[i]] = self.presentation_list[i]
 
-        self.presentation_list.sort(key=lambda p: p.assigned_venue.venue_id)
         for presentation in self.presentation_list:
             list_of_presentation_id.append(presentation.presentation_id)
 
@@ -154,7 +153,7 @@ class Candidate:
                 # that is in a slot that has the same time and day
                 for i in range(4):
                     # gets venue_id of presentations with same time and day
-                    same_time_venue_id = presentation.assigned_venue.day * 60 + i * 15 + presentation.assigned_venue.time + 1
+                    same_time_venue_id = presentation.assigned_venue.day * 60 + i * 15 + presentation.assigned_venue.time
                     # refers venue_presentation dictionary to obtain the respective presentation
                     other_presentation = venue_presentation.get(same_time_venue_id)
                     if other_presentation and other_presentation.presentation_id != presentation.presentation_id:
@@ -177,7 +176,7 @@ class Candidate:
                         previous_time_slot = presentation.assigned_venue.time - 1
                         for i in range(4):
                             # get all presentations that uses the time slot before the current presentation
-                            previous_venue_id = presentation.assigned_venue.day * 60 + i * 15 + previous_time_slot + 1
+                            previous_venue_id = presentation.assigned_venue.day * 60 + i * 15 + previous_time_slot
                             other_presentation = venue_presentation.get(previous_venue_id)
 
                             # runs when other_presentation points towards a presentation occupying the previous time slot
@@ -203,8 +202,8 @@ class Candidate:
                         else:
                             total_fitness += 10
 
-        #HC01 : A presentation is scheduled more than once
-        if(len(list_of_presentation_id)) > len(set(list_of_presentation_id)):
+        # HC01 : A presentation is scheduled more than once
+        if (len(list_of_presentation_id)) > len(set(list_of_presentation_id)):
             num_of_duplicates = len(list_of_presentation_id) - len(set(list_of_presentation_id))
             total_fitness += (num_of_duplicates * 1000)
 
@@ -263,7 +262,7 @@ class GeneticAlgorithm:
             child1 = childs[0]
             child2 = childs[1]
 
-            mutate_percent = 0.01
+            mutate_percent = 0.05
             m1 = random.random() <= mutate_percent
             m2 = random.random() <= mutate_percent
 
@@ -291,16 +290,69 @@ class GeneticAlgorithm:
     def uniform_crossover(self, c1, c2):
         obj = Candidate(self.staff_list)
         obj2 = Candidate(self.staff_list)
+        obj_list = []  # To store conflict node (existing venue) of obj
+        obj2_list = []  # To store conflict node (existing venue) of obj2
 
+        # Perform crossover on same genes or other genes based on probability
         for i in range(obj.SIZE):
             b = random.random() >= 0.5
 
             if b:
-                obj.presentation_list[i] = c1.presentation_list[i]
-                obj2.presentation_list[i] = c2.presentation_list[i]
+                if c1.random_venue_list[i] not in obj.random_venue_list:
+                    obj.presentation_list[i].assigned_venue = c1.presentation_list[i].assigned_venue
+                    obj.random_venue_list[i] = c1.random_venue_list[i]
+                else:
+                    obj_list.append((i, c1.random_venue_list[i]))
+                if c2.random_venue_list[i] not in obj2.random_venue_list:
+                    obj2.presentation_list[i].assigned_venue = c2.presentation_list[i].assigned_venue
+                    obj2.random_venue_list[i] = c2.random_venue_list[i]
+                else:
+                    obj2_list.append((i, c2.random_venue_list[i]))
             else:
-                obj.presentation_list[i] = c2.presentation_list[i]
-                obj2.presentation_list[i] = c1.presentation_list[i]
+                if c2.random_venue_list[i] not in obj.random_venue_list:
+                    obj.presentation_list[i].assigned_venue = c2.presentation_list[i].assigned_venue
+                    obj.random_venue_list[i] = c2.random_venue_list[i]
+                else:
+                    obj_list.append((i, c2.random_venue_list[i]))
+                if c1.random_venue_list[i] not in obj2.random_venue_list:
+                    obj2.presentation_list[i].assigned_venue = c1.presentation_list[i].assigned_venue
+                    obj2.random_venue_list[i] = c1.random_venue_list[i]
+                else:
+                    obj2_list.append((i, c1.random_venue_list[i]))
+
+        # Search if redundant venue in other list of genes is found in its list of genes. Assign to itself it is not.
+        temp = obj_list
+        temp2 = obj2_list
+        for x in range(len(obj2_list)):
+            for y in range(len(temp)):
+                if obj2_list[x][1] not in obj.random_venue_list:
+                    obj.presentation_list[temp[y][0]].assigned_venue = self.venue_list[obj2_list[x][1]]
+                    obj.random_venue_list[temp[y][0]] = obj2_list[x][1]
+                    temp.remove(temp[y])
+                    break
+
+        for x in range(len(obj_list)):
+            for y in range(len(temp2)):
+                if obj_list[x][1] not in obj2.random_venue_list:
+                    obj2.presentation_list[temp2[y][0]].assigned_venue = self.venue_list[obj_list[x][1]]
+                    obj2.random_venue_list[temp[y][0]] = obj_list[x][1]
+                    temp2.remove(temp2[y])
+                    break
+
+        # Assign random unexisting venue if there are still presentation without any venue.
+        for x in range(len(temp)):
+            j = random.randint(1, 300)
+            while j in obj.random_venue_list:
+                j = random.randint(1, 300)
+            obj.presentation_list[temp[x][0]].assigned_venue = self.venue_list[j-1]
+            obj.random_venue_list[temp[x][0]] = j-1
+
+        for x in range(len(temp2)):
+            j = random.randint(1, 300)
+            while j in obj2.random_venue_list:
+                j = random.randint(1, 300)
+            obj2.presentation_list[temp2[x][0]].assigned_venue = self.venue_list[j - 1]
+            obj2.random_venue_list[temp2[x][0]] = j-1
 
         return obj, obj2
 
@@ -315,15 +367,15 @@ class GeneticAlgorithm:
         obj.presentation_list[i].assigned_venue = self.venue_list[j - 1]  # Update new venue for chosen presentation
 
     def run(self):
-        max_steps = 10
+        max_steps = 200
         for i in range(max_steps):
             print("Processing Generation ", i + 1, "/", max_steps)
             self.generate_new_gen()
-            self.population[0].print()
+            # self.population[0].print()
             print("Fitness: ", self.population[0].fitness())
         print("Done!!!")
-        print("Best arrangement are:")
-        self.population[0].print()
+        # print("Best arrangement are:")
+        # self.population[0].print()
         print("Fitness: ", self.population[0].fitness())
 
 
