@@ -167,12 +167,10 @@ class Candidate:
             for presentation in self.presentation_list:
 
                 if staff in presentation.staff_list:
-                    if presentation.assigned_venue.time > 0:  # presentation is not the first one for the day
-                        # stores the modulus 15 value of the previous venue id
-                        previous_time_slot = presentation.assigned_venue.time - 1
-
                     # SC01 and SC03
                     if presentation.assigned_venue.time != 0:  # presentation is not the first one for the day
+                        # stores the modulus 15 value of the previous venue id
+                        previous_time_slot = presentation.assigned_venue.time - 1
                         for i in range(4):
                             # get all presentations that uses the time slot before the current presentation
                             previous_venue_id = presentation.assigned_venue.day * 60 + i * 15 + previous_time_slot
