@@ -282,16 +282,69 @@ class GeneticAlgorithm:
     def uniform_crossover(self, c1, c2):
         obj = Candidate(self.staff_list)
         obj2 = Candidate(self.staff_list)
+        obj_list = []  # To store conflict node (existing venue) of obj
+        obj2_list = []  # To store conflict node (existing venue) of obj2
 
+        # Perform crossover on same genes or other genes based on probability
         for i in range(obj.SIZE):
             b = random.random() >= 0.5
 
             if b:
-                obj.presentation_list[i] = c1.presentation_list[i]
-                obj2.presentation_list[i] = c2.presentation_list[i]
+                if c1.random_venue_list[i] not in obj.random_venue_list:
+                    obj.presentation_list[i].assigned_venue = c1.presentation_list[i].assigned_venue
+                    obj.random_venue_list[i] = c1.random_venue_list[i]
+                else:
+                    obj_list.append((i, c1.random_venue_list[i]))
+                if c2.random_venue_list[i] not in obj2.random_venue_list:
+                    obj2.presentation_list[i].assigned_venue = c2.presentation_list[i].assigned_venue
+                    obj2.random_venue_list[i] = c2.random_venue_list[i]
+                else:
+                    obj2_list.append((i, c2.random_venue_list[i]))
             else:
-                obj.presentation_list[i] = c2.presentation_list[i]
-                obj2.presentation_list[i] = c1.presentation_list[i]
+                if c2.random_venue_list[i] not in obj.random_venue_list:
+                    obj.presentation_list[i].assigned_venue = c2.presentation_list[i].assigned_venue
+                    obj.random_venue_list[i] = c2.random_venue_list[i]
+                else:
+                    obj_list.append((i, c2.random_venue_list[i]))
+                if c1.random_venue_list[i] not in obj2.random_venue_list:
+                    obj2.presentation_list[i].assigned_venue = c1.presentation_list[i].assigned_venue
+                    obj2.random_venue_list[i] = c1.random_venue_list[i]
+                else:
+                    obj2_list.append((i, c1.random_venue_list[i]))
+
+        # Search if redundant venue in other list of genes is found in its list of genes. Assign to itself it is not.
+        temp = obj_list
+        temp2 = obj2_list
+        for x in range(len(obj2_list)):
+            for y in range(len(temp)):
+                if obj2_list[x][1] not in obj.random_venue_list:
+                    obj.presentation_list[temp[y][0]].assigned_venue = self.venue_list[obj2_list[x][1]]
+                    obj.random_venue_list[temp[y][0]] = obj2_list[x][1]
+                    temp.remove(temp[y])
+                    break
+
+        for x in range(len(obj_list)):
+            for y in range(len(temp2)):
+                if obj_list[x][1] not in obj2.random_venue_list:
+                    obj2.presentation_list[temp2[y][0]].assigned_venue = self.venue_list[obj_list[x][1]]
+                    obj2.random_venue_list[temp[y][0]] = obj_list[x][1]
+                    temp2.remove(temp2[y])
+                    break
+
+        # Assign random unexisting venue if there are still presentation without any venue.
+        for x in range(len(temp)):
+            j = random.randint(1, 300)
+            while j in obj.random_venue_list:
+                j = random.randint(1, 300)
+            obj.presentation_list[temp[x][0]].assigned_venue = self.venue_list[j-1]
+            obj.random_venue_list[temp[x][0]] = j
+
+        for x in range(len(temp2)):
+            j = random.randint(1, 300)
+            while j in obj2.random_venue_list:
+                j = random.randint(1, 300)
+            obj2.presentation_list[temp2[x][0]].assigned_venue = self.venue_list[j - 1]
+            obj2.random_venue_list[temp2[x][0]] = j
 
         return obj, obj2
 
