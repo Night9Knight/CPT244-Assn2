@@ -2,6 +2,7 @@ import csv
 import random
 from tqdm import trange
 from colorama import Fore
+from tabulate import tabulate
 
 
 class Staff:
@@ -370,7 +371,7 @@ class GeneticAlgorithm:
         obj.presentation_list[i].assigned_venue = self.venue_list[j]  # Update new venue for chosen presentation
 
     def run(self):
-        max_steps = 10
+        max_steps = 5
 
         pbar = trange(1, max_steps + 1, bar_format="{l_bar}%s{bar}%s{r_bar}" % (Fore.WHITE, Fore.RESET))
         for item in pbar:
@@ -378,13 +379,36 @@ class GeneticAlgorithm:
             pbar.set_description("Processing Generation %d" % item)
             self.generate_new_gen()
 
-        print("Done!!!")
-        result_list = [None]*300
+        self.print_result()
+
+    def print_result(self):
+        print("\nDone!!!")
+        result_list = ["null"] * 300
+        final_result_list = []
+        filename = "GA_Result.csv"
+        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+        venue = ["VR", "MR", "IR", "BJIM"]
         for presentation in self.population[0].presentation_list:
-            result_list[presentation.assigned_venue.venue_id-1] = presentation.presentation_id
-        print("Best arrangement are:")
-        print(result_list)
+            result_list[presentation.assigned_venue.venue_id - 1] = presentation.presentation_id
+
+        for i in range(0, len(result_list), 15):
+            sub = [days[int(i / 60)], venue[int(i / 15) % 4]]
+            for j in range(15):
+                sub.append(result_list[i + j])
+            final_result_list.append(sub)
+
+        with open(filename, mode='w') as GAFile:
+            file_writer = csv.writer(GAFile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            file_writer.writerow(result_list)
+
+        print("\nBest arrangement are:")
+        print(tabulate(final_result_list, headers=["Days of Week", "Venue", "\n\n0900-0930", "\n\n0930-1000",
+                                                   "\n\n1000-1030", "\n\n1030-1100", "\n\n1100-1130", "\n\n1130-1200",
+                                                   "\n\n1200-1230", "Time Slots\n\n1230-1300", "\n\n1400-1430",
+                                                   "\n\n1430-1500", "\n\n1500-1530", "\n\n1530-1600", "\n\n1600-1630",
+                                                   "\n\n1630-1700", "\n\n1700-1730"], tablefmt="pretty", colalign=("center","left")))
         print("Fitness: ", self.population[0].fitness())
+        print("\nThe result has been saved into ", filename)
 
 
 # result = GeneticAlgorithm()
