@@ -3,6 +3,7 @@ import random
 from tqdm import trange
 from colorama import Fore
 from tabulate import tabulate
+import os
 
 
 class Staff:
@@ -228,9 +229,9 @@ class Candidate:
 
 
 class GeneticAlgorithm:
-    def __init__(self):
+    def __init__(self, size):
         self.population = []  # List of candidates
-        self.pop_size = 400
+        self.pop_size = size
         self.parent_use_percent = 10.0
         self.staff_list = staff_record_handler()
         self.venue_list = venue_record_handler()
@@ -240,7 +241,7 @@ class GeneticAlgorithm:
             self.population.append(new_candidate)
         self.population = sorted(self.population, key=lambda candidate: candidate.fitness())  # Sort the population
 
-    def generate_new_gen(self):
+    def generate_new_gen(self, mut):
         new_pop = []
 
         while len(new_pop) < self.pop_size * (1.0 - (self.parent_use_percent / 100.0)):
@@ -266,7 +267,7 @@ class GeneticAlgorithm:
             child1 = childs[0]
             child2 = childs[1]
 
-            mutate_percent = 0.05
+            mutate_percent = mut
             m1 = random.random() <= mutate_percent
             m2 = random.random() <= mutate_percent
 
@@ -370,14 +371,14 @@ class GeneticAlgorithm:
         obj.random_venue_list[i] = j  # Update the venue occupied by the chosen presentation
         obj.presentation_list[i].assigned_venue = self.venue_list[j]  # Update new venue for chosen presentation
 
-    def run(self):
-        max_steps = 5
+    def run(self, steps, mut):
+        max_steps = steps
 
         pbar = trange(1, max_steps + 1, bar_format="{l_bar}%s{bar}%s{r_bar}" % (Fore.WHITE, Fore.RESET))
         for item in pbar:
             pass
             pbar.set_description("Processing Generation %d" % item)
-            self.generate_new_gen()
+            self.generate_new_gen(mut)
 
         self.print_result()
 
@@ -406,20 +407,57 @@ class GeneticAlgorithm:
                                                    "\n\n1000-1030", "\n\n1030-1100", "\n\n1100-1130", "\n\n1130-1200",
                                                    "\n\n1200-1230", "Time Slots\n\n1230-1300", "\n\n1400-1430",
                                                    "\n\n1430-1500", "\n\n1500-1530", "\n\n1530-1600", "\n\n1600-1630",
-                                                   "\n\n1630-1700", "\n\n1700-1730"], tablefmt="pretty", colalign=("center","left")))
+                                                   "\n\n1630-1700", "\n\n1700-1730"], tablefmt="pretty",
+                       colalign=("center", "left")))
         print("Fitness: ", self.population[0].fitness())
         print("\nThe result has been saved into ", filename)
 
 
 # result = GeneticAlgorithm()
-# venue_run = venue_record_handler()
-# for item in venue_run:
-#   print(item.venue_id, item.venue_type, item.availability, item.day, item.time)
+cmd_dict = {"1": "result.run", "2": "exit()", "help": None}  # store functionality
 
-# staff_run = staff_record_handler()
-# for record in staff_run:
-#   print(staff_run[record].staff_id, staff_run[record].attend_day, staff_run[record].unavailable_slot,
-#        staff_run[record].same_venue_pref, staff_run[record].consecutive_presentation_pref)
 
-GeneticAlgorithm().run()
-# run.population[0].print()
+def clear():
+    os.system('cls')
+
+
+while True:
+    cmds = ["\nCommand list: ",
+            "              1            :   Run the Genetic Algorithm.",
+            "              2            :   Exit.",
+            "              help         :   Show commands.\n"]
+    print("Hi user, this is our CPT 244 Assignment 2: Presentation Scheduling Using Genetic Algorithm".center(120, '_'))
+    print("\n".join(cmds))
+    cmdInput = input("Choose a command.\n")
+    clear()
+
+    if cmdInput in cmd_dict:
+        if cmdInput == "1":
+            pop_size = input("\nPlease enter your desire population size. (Recommended: 400)\n")
+            try:
+                val = int(pop_size)
+            except ValueError:
+                print("Invalid Input.")
+                break
+            result = eval("GeneticAlgorithm(val)")
+            print("\nInitialization of Initial Population Done.")
+            num_run = input("\nPlease enter your desire number of runs. (Recommended: >=150)\n")
+            try:
+                val = int(num_run)
+            except ValueError:
+                print("Invalid Input.")
+                break
+            mut_rate = input("\nPlease enter your desire mutation rate. (Recommended: <=0.01)\n")
+            try:
+                val2 = float(mut_rate)
+                if val2 < 0 or val2 > 1.0:
+                    print("Invalid range of input.")
+                    break
+            except ValueError:
+                print("Invalid Input.")
+                break
+            clear()
+            eval(cmd_dict[cmdInput] + "(val,val2)")
+
+        else:
+            eval(cmd_dict[cmdInput])
