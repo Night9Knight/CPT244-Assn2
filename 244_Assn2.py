@@ -384,11 +384,6 @@ class GeneticAlgorithm:
 
     def print_result(self):
         print("\nDone!!!")
-        print("\nChoose an output format\n1. Table\n2. CSV")
-        option = input("Choose an option : ")
-        while option != "1" and option != "2":
-            print("Invalid input, please try again. ")
-            option = input("Choose an option : ")
             
         result_list = ["null"] * 300
         final_result_list = []
@@ -408,6 +403,12 @@ class GeneticAlgorithm:
             file_writer = csv.writer(GAFile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             file_writer.writerow(result_list)
 
+        print("\nChoose an output format\n1. Table\n2. CSV\n3. Both")
+        option = input("Choose an option : ")
+        while option != "1" and option != "2" and option != "3":
+            print("Invalid input, please try again. ")
+            option = input("Choose an option : ")
+
         print("\nBest arrangement are:")
         if option == "1":
             print(tabulate(final_result_list, headers=["Days of Week", "Venue", "\n\n0900-0930", "\n\n0930-1000",
@@ -422,7 +423,22 @@ class GeneticAlgorithm:
             print(result_list[0], end="")
             for i in range(1, len(result_list)):
                 print(", ", result_list[i], end="")
-        print("\nFitness: ", self.population[0].fitness())
+
+        else:
+            print("Table : ")
+            print(tabulate(final_result_list, headers=["Days of Week", "Venue", "\n\n0900-0930", "\n\n0930-1000",
+                                                       "\n\n1000-1030", "\n\n1030-1100", "\n\n1100-1130",
+                                                       "\n\n1130-1200",
+                                                       "\n\n1200-1230", "Time Slots\n\n1230-1300", "\n\n1400-1430",
+                                                       "\n\n1430-1500", "\n\n1500-1530", "\n\n1530-1600",
+                                                       "\n\n1600-1630",
+                                                       "\n\n1630-1700", "\n\n1700-1730"], tablefmt="pretty",
+                           colalign=("center", "left")))
+            print("\nCSV : ")
+            for i in range(len(result_list)):
+                print(result_list[i], end=", ")
+
+        print("\n\nFitness: ", self.population[0].fitness())
         print("\nThe result has been saved into ", filename)
 
 
