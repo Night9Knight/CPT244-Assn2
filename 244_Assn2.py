@@ -389,6 +389,7 @@ class GeneticAlgorithm:
         while option != "1" and option != "2":
             print("Invalid input, please try again. ")
             option = input("Choose an option : ")
+            
         result_list = ["null"] * 300
         final_result_list = []
         filename = "GA_Result.csv"
@@ -444,8 +445,7 @@ while True:
     cmds = ["\nCommand list: ",
             "              1            :   Run the Genetic Algorithm.",
             "              2            :   Exit.\n"]
-    print(
-        "\nHi user, this is our CPT 244 Assignment 2: Presentation Scheduling Using Genetic Algorithm".center(120, '_'))
+    print("\nHi user, this is our CPT 244 Assignment 2: Presentation Scheduling Using Genetic Algorithm".center(120, '_'))
     print("\n".join(cmds))
     cmdInput = input("Choose a command.\n")
     clear()
@@ -460,6 +460,7 @@ while True:
                 break
             result = eval("GeneticAlgorithm(val)")
             print("\nInitialization of Initial Population Done.")
+            
             num_run = input("\nPlease enter your desire number of runs. (Recommended: >=300)\n")
             try:
                 val = int(num_run)
@@ -478,7 +479,7 @@ while True:
             clear()
             eval(cmd_dict[cmdInput] + "(val,val2)")
 
-        elif cmdInput == "2":
+        else:
             eval(cmd_dict[cmdInput])
     else:
-        print("Invalid input.")
+        print("\nInvalid input.")

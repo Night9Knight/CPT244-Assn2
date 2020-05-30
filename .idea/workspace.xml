@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cd0bb696-e80d-4428-8fbc-733b15b16966" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/GA_Result.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/244_Assn2.py" beforeDir="false" afterPath="$PROJECT_DIR$/244_Assn2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA_Result.csv" beforeDir="false" afterPath="$PROJECT_DIR$/GA_Result.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +33,7 @@
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="RainbowCSV.Settings" />
   </component>
   <component name="RunManager">
     <configuration name="244_Assn2" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
@@ -79,26 +80,26 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state width="1238" height="672" key="GridCell.Tab.0.bottom" timestamp="1590828445846">
+    <state width="1238" height="672" key="GridCell.Tab.0.bottom" timestamp="1590811677388">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
-    <state width="1238" height="672" key="GridCell.Tab.0.bottom/62.0.1474.864@62.0.1474.864" timestamp="1590828445846" />
-    <state width="1238" height="672" key="GridCell.Tab.0.center" timestamp="1590828445846">
+    <state width="1238" height="672" key="GridCell.Tab.0.bottom/62.0.1474.864@62.0.1474.864" timestamp="1590811677388" />
+    <state width="1238" height="672" key="GridCell.Tab.0.center" timestamp="1590811677388">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
-    <state width="1238" height="672" key="GridCell.Tab.0.center/62.0.1474.864@62.0.1474.864" timestamp="1590828445846" />
-    <state width="1238" height="672" key="GridCell.Tab.0.left" timestamp="1590828445846">
+    <state width="1238" height="672" key="GridCell.Tab.0.center/62.0.1474.864@62.0.1474.864" timestamp="1590811677388" />
+    <state width="1238" height="672" key="GridCell.Tab.0.left" timestamp="1590811677388">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
-    <state width="1238" height="672" key="GridCell.Tab.0.left/62.0.1474.864@62.0.1474.864" timestamp="1590828445846" />
-    <state width="1238" height="672" key="GridCell.Tab.0.right" timestamp="1590828445846">
+    <state width="1238" height="672" key="GridCell.Tab.0.left/62.0.1474.864@62.0.1474.864" timestamp="1590811677388" />
+    <state width="1238" height="672" key="GridCell.Tab.0.right" timestamp="1590811677388">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
-    <state width="1238" height="672" key="GridCell.Tab.0.right/62.0.1474.864@62.0.1474.864" timestamp="1590828445846" />
-    <state x="308" y="77" key="SettingsEditor" timestamp="1589692176220">
+    <state width="1238" height="672" key="GridCell.Tab.0.right/62.0.1474.864@62.0.1474.864" timestamp="1590811677388" />
+    <state x="308" y="77" key="SettingsEditor" timestamp="1590574697164">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
-    <state x="308" y="77" key="SettingsEditor/62.0.1474.864@62.0.1474.864" timestamp="1589692176220" />
+    <state x="308" y="77" key="SettingsEditor/62.0.1474.864@62.0.1474.864" timestamp="1590574697164" />
     <state x="496" y="256" key="com.intellij.ide.util.TipDialog" timestamp="1589681376868">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
