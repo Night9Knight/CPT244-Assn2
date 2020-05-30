@@ -1,5 +1,9 @@
 import csv
 import random
+from tqdm import trange
+from colorama import Fore
+from tabulate import tabulate
+import os
 
 
 class Staff:
@@ -137,6 +141,7 @@ class Candidate:
         for i in range(self.SIZE):
             venue_presentation[self.random_venue_list[i]] = self.presentation_list[i]
 
+        # self.presentation_list.sort(key=lambda p: p.assigned_venue.venue_id)
         for presentation in self.presentation_list:
             list_of_presentation_id.append(presentation.presentation_id)
 
@@ -224,9 +229,9 @@ class Candidate:
 
 
 class GeneticAlgorithm:
-    def __init__(self):
+    def __init__(self, size):
         self.population = []  # List of candidates
-        self.pop_size = 400
+        self.pop_size = size
         self.parent_use_percent = 10.0
         self.staff_list = staff_record_handler()
         self.venue_list = venue_record_handler()
@@ -236,7 +241,7 @@ class GeneticAlgorithm:
             self.population.append(new_candidate)
         self.population = sorted(self.population, key=lambda candidate: candidate.fitness())  # Sort the population
 
-    def generate_new_gen(self):
+    def generate_new_gen(self, mut):
         new_pop = []
 
         while len(new_pop) < self.pop_size * (1.0 - (self.parent_use_percent / 100.0)):
@@ -262,7 +267,7 @@ class GeneticAlgorithm:
             child1 = childs[0]
             child2 = childs[1]
 
-            mutate_percent = 0.05
+            mutate_percent = mut
             m1 = random.random() <= mutate_percent
             m2 = random.random() <= mutate_percent
 
@@ -341,53 +346,128 @@ class GeneticAlgorithm:
 
         # Assign random unexisting venue if there are still presentation without any venue.
         for x in range(len(temp)):
-            j = random.randint(1, 300)
+            j = random.randint(0, 299)
             while j in obj.random_venue_list:
-                j = random.randint(1, 300)
-            obj.presentation_list[temp[x][0]].assigned_venue = self.venue_list[j-1]
-            obj.random_venue_list[temp[x][0]] = j-1
+                j = random.randint(0, 299)
+            obj.presentation_list[temp[x][0]].assigned_venue = self.venue_list[j]
+            obj.random_venue_list[temp[x][0]] = j
 
         for x in range(len(temp2)):
-            j = random.randint(1, 300)
+            j = random.randint(0, 299)
             while j in obj2.random_venue_list:
-                j = random.randint(1, 300)
-            obj2.presentation_list[temp2[x][0]].assigned_venue = self.venue_list[j - 1]
-            obj2.random_venue_list[temp2[x][0]] = j-1
+                j = random.randint(0, 299)
+            obj2.presentation_list[temp2[x][0]].assigned_venue = self.venue_list[j]
+            obj2.random_venue_list[temp2[x][0]] = j
 
         return obj, obj2
 
     def mutate(self, obj):
         i = random.randint(0, obj.SIZE - 1)
-        j = random.randint(1, 300)
+        j = random.randint(0, 299)
 
         while j in obj.random_venue_list:
-            j = random.randint(1, 300)
+            j = random.randint(0, 299)
 
         obj.random_venue_list[i] = j  # Update the venue occupied by the chosen presentation
-        obj.presentation_list[i].assigned_venue = self.venue_list[j - 1]  # Update new venue for chosen presentation
+        obj.presentation_list[i].assigned_venue = self.venue_list[j]  # Update new venue for chosen presentation
 
-    def run(self):
-        max_steps = 200
-        for i in range(max_steps):
-            print("Processing Generation ", i + 1, "/", max_steps)
-            self.generate_new_gen()
-            # self.population[0].print()
-            print("Fitness: ", self.population[0].fitness())
-        print("Done!!!")
-        # print("Best arrangement are:")
-        # self.population[0].print()
+    def run(self, steps, mut):
+        max_steps = steps
+
+        pbar = trange(1, max_steps + 1, bar_format="{l_bar}%s{bar}%s{r_bar}" % (Fore.WHITE, Fore.RESET))
+        for item in pbar:
+            pass
+            pbar.set_description("Processing Generation %d" % item)
+            self.generate_new_gen(mut)
+
+        self.print_result()
+
+    def print_result(self):
+        print("\nDone!!!")
+        print("\nChoose an output format\n1. Table\n2. CSV")
+        option = input("Choose an option : ")
+        while option != "1" and option != "2":
+            print("Invalid input, please try again. ")
+            option = input("Choose an option : ")
+        result_list = ["null"] * 300
+        final_result_list = []
+        filename = "GA_Result.csv"
+        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+        venue = ["VR", "MR", "IR", "BJIM"]
+        for presentation in self.population[0].presentation_list:
+            result_list[presentation.assigned_venue.venue_id - 1] = presentation.presentation_id
+
+        for i in range(0, len(result_list), 15):
+            sub = [days[int(i / 60)], venue[int(i / 15) % 4]]
+            for j in range(15):
+                sub.append(result_list[i + j])
+            final_result_list.append(sub)
+
+        with open(filename, mode='w') as GAFile:
+            file_writer = csv.writer(GAFile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            file_writer.writerow(result_list)
+
+        print("\nBest arrangement are:")
+        if option == "1":
+            print(tabulate(final_result_list, headers=["Days of Week", "Venue", "\n\n0900-0930", "\n\n0930-1000",
+                                                       "\n\n1000-1030", "\n\n1030-1100", "\n\n1100-1130", "\n\n1130-1200",
+                                                       "\n\n1200-1230", "Time Slots\n\n1230-1300", "\n\n1400-1430",
+                                                       "\n\n1430-1500", "\n\n1500-1530", "\n\n1530-1600", "\n\n1600-1630",
+                                                       "\n\n1630-1700", "\n\n1700-1730"], tablefmt="pretty",
+                           colalign=("center", "left")))
+        elif option == "2":
+            for i in range(len(result_list)):
+                print(result_list[i], end=", ")
         print("Fitness: ", self.population[0].fitness())
+        print("\nThe result has been saved into ", filename)
+
 
 
 # result = GeneticAlgorithm()
-# venue_run = venue_record_handler()
-# for item in venue_run:
-#   print(item.venue_id, item.venue_type, item.availability, item.day, item.time)
+cmd_dict = {"1": "result.run", "2": "exit()", "help": None}  # store functionality
 
-# staff_run = staff_record_handler()
-# for record in staff_run:
-#   print(staff_run[record].staff_id, staff_run[record].attend_day, staff_run[record].unavailable_slot,
-#        staff_run[record].same_venue_pref, staff_run[record].consecutive_presentation_pref)
 
-GeneticAlgorithm().run()
-# run.population[0].print()
+def clear():
+    os.system('cls')
+
+
+while True:
+    cmds = ["\nCommand list: ",
+            "              1            :   Run the Genetic Algorithm.",
+            "              2            :   Exit.",
+            "              help         :   Show commands.\n"]
+    print("Hi user, this is our CPT 244 Assignment 2: Presentation Scheduling Using Genetic Algorithm".center(120, '_'))
+    print("\n".join(cmds))
+    cmdInput = input("Choose a command.\n")
+    clear()
+
+    if cmdInput in cmd_dict:
+        if cmdInput == "1":
+            pop_size = input("\nPlease enter your desire population size. (Recommended: 400)\n")
+            try:
+                val = int(pop_size)
+            except ValueError:
+                print("Invalid Input.")
+                break
+            result = eval("GeneticAlgorithm(val)")
+            print("\nInitialization of Initial Population Done.")
+            num_run = input("\nPlease enter your desire number of runs. (Recommended: >=150)\n")
+            try:
+                val = int(num_run)
+            except ValueError:
+                print("Invalid Input.")
+                break
+            mut_rate = input("\nPlease enter your desire mutation rate. (Recommended: <=0.01)\n")
+            try:
+                val2 = float(mut_rate)
+                if val2 < 0 or val2 > 1.0:
+                    print("Invalid range of input.")
+                    break
+            except ValueError:
+                print("Invalid Input.")
+                break
+            clear()
+            eval(cmd_dict[cmdInput] + "(val,val2)")
+
+        else:
+            eval(cmd_dict[cmdInput])
