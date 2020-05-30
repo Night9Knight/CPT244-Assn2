@@ -414,18 +414,24 @@ class GeneticAlgorithm:
 
 
 # result = GeneticAlgorithm()
-cmd_dict = {"1": "result.run", "2": "exit()", "help": None}  # store functionality
+cmd_dict = {"1": "result.run", "2": "exit()"}  # store functionality
 
 
+# define our clear function
 def clear():
-    os.system('cls')
+    # for windows
+    if os.name == 'nt':
+        _ = os.system('cls')
+
+        # for mac and linux(here, os.name is 'posix')
+    else:
+        _ = os.system('clear')
 
 
 while True:
     cmds = ["\nCommand list: ",
             "              1            :   Run the Genetic Algorithm.",
-            "              2            :   Exit.",
-            "              help         :   Show commands.\n"]
+            "              2            :   Exit.\n"]
     print("Hi user, this is our CPT 244 Assignment 2: Presentation Scheduling Using Genetic Algorithm".center(120, '_'))
     print("\n".join(cmds))
     cmdInput = input("Choose a command.\n")
@@ -433,7 +439,7 @@ while True:
 
     if cmdInput in cmd_dict:
         if cmdInput == "1":
-            pop_size = input("\nPlease enter your desire population size. (Recommended: 400)\n")
+            pop_size = input("\nPlease enter your desire population size. (Recommended: 300)\n")
             try:
                 val = int(pop_size)
             except ValueError:
@@ -447,7 +453,7 @@ while True:
             except ValueError:
                 print("Invalid Input.")
                 break
-            mut_rate = input("\nPlease enter your desire mutation rate. (Recommended: <=0.01)\n")
+            mut_rate = input("\nPlease enter your desire mutation rate. (Recommended: <=0.05)\n")
             try:
                 val2 = float(mut_rate)
                 if val2 < 0 or val2 > 1.0:
