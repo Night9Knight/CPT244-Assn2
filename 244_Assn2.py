@@ -435,8 +435,9 @@ class GeneticAlgorithm:
                                                        "\n\n1630-1700", "\n\n1700-1730"], tablefmt="pretty",
                            colalign=("center", "left")))
             print("\nCSV : ")
-            for i in range(len(result_list)):
-                print(result_list[i], end=", ")
+            print(result_list[0], end="")
+            for i in range(1, len(result_list)):
+                print(", ", result_list[i], end="")
 
         print("\n\nFitness: ", self.population[0].fitness())
         print("\nThe result has been saved into ", filename)
