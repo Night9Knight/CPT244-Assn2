@@ -384,6 +384,12 @@ class GeneticAlgorithm:
 
     def print_result(self):
         print("\nDone!!!")
+        print("\nChoose an output format\n1. Table\n2. CSV")
+        option = input("Choose an option : ")
+        while option != "1" and option != "2":
+            print("Invalid input, please try again. ")
+            option = input("Choose an option : ")
+            
         result_list = ["null"] * 300
         final_result_list = []
         filename = "GA_Result.csv"
@@ -403,13 +409,20 @@ class GeneticAlgorithm:
             file_writer.writerow(result_list)
 
         print("\nBest arrangement are:")
-        print(tabulate(final_result_list, headers=["Days of Week", "Venue", "\n\n0900-0930", "\n\n0930-1000",
-                                                   "\n\n1000-1030", "\n\n1030-1100", "\n\n1100-1130", "\n\n1130-1200",
-                                                   "\n\n1200-1230", "Time Slots\n\n1230-1300", "\n\n1400-1430",
-                                                   "\n\n1430-1500", "\n\n1500-1530", "\n\n1530-1600", "\n\n1600-1630",
-                                                   "\n\n1630-1700", "\n\n1700-1730"], tablefmt="pretty",
-                       colalign=("center", "left")))
-        print("Fitness: ", self.population[0].fitness())
+        if option == "1":
+            print(tabulate(final_result_list, headers=["Days of Week", "Venue", "\n\n0900-0930", "\n\n0930-1000",
+                                                       "\n\n1000-1030", "\n\n1030-1100", "\n\n1100-1130",
+                                                       "\n\n1130-1200",
+                                                       "\n\n1200-1230", "Time Slots\n\n1230-1300", "\n\n1400-1430",
+                                                       "\n\n1430-1500", "\n\n1500-1530", "\n\n1530-1600",
+                                                       "\n\n1600-1630",
+                                                       "\n\n1630-1700", "\n\n1700-1730"], tablefmt="pretty",
+                           colalign=("center", "left")))
+        elif option == "2":
+            print(result_list[0], end="")
+            for i in range(1, len(result_list)):
+                print(", ", result_list[i], end="")
+        print("\nFitness: ", self.population[0].fitness())
         print("\nThe result has been saved into ", filename)
 
 
@@ -432,7 +445,7 @@ while True:
     cmds = ["\nCommand list: ",
             "              1            :   Run the Genetic Algorithm.",
             "              2            :   Exit.\n"]
-    print("Hi user, this is our CPT 244 Assignment 2: Presentation Scheduling Using Genetic Algorithm".center(120, '_'))
+    print("\nHi user, this is our CPT 244 Assignment 2: Presentation Scheduling Using Genetic Algorithm".center(120, '_'))
     print("\n".join(cmds))
     cmdInput = input("Choose a command.\n")
     clear()
@@ -447,7 +460,8 @@ while True:
                 break
             result = eval("GeneticAlgorithm(val)")
             print("\nInitialization of Initial Population Done.")
-            num_run = input("\nPlease enter your desire number of runs. (Recommended: >=150)\n")
+            
+            num_run = input("\nPlease enter your desire number of runs. (Recommended: >=300)\n")
             try:
                 val = int(num_run)
             except ValueError:
@@ -467,3 +481,5 @@ while True:
 
         else:
             eval(cmd_dict[cmdInput])
+    else:
+        print("\nInvalid input.")
