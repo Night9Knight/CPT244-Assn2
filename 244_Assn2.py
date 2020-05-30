@@ -384,12 +384,11 @@ class GeneticAlgorithm:
 
     def print_result(self):
         print("\nDone!!!")
-        print("\nChoose an output format\n1. Table\n2. CSV")
+        print("\nChoose an output format\n1. Table\n2. CSV\n3. Table & CSV")
         option = input("Choose an option : ")
-        while option != "1" and option != "2":
+        while option != "1" and option != "2" and option != "3":
             print("Invalid input, please try again. ")
             option = input("Choose an option : ")
-            
         result_list = ["null"] * 300
         final_result_list = []
         filename = "GA_Result.csv"
@@ -409,50 +408,56 @@ class GeneticAlgorithm:
             file_writer.writerow(result_list)
 
         print("\nBest arrangement are:")
+        if option == "3":
+            print("Table : ")
+            print(tabulate(final_result_list, headers=["Days of Week", "Venue", "\n\n0900-0930", "\n\n0930-1000",
+                                                       "\n\n1000-1030", "\n\n1030-1100", "\n\n1100-1130", "\n\n1130-1200",
+                                                       "\n\n1200-1230", "Time Slots\n\n1230-1300", "\n\n1400-1430",
+                                                       "\n\n1430-1500", "\n\n1500-1530", "\n\n1530-1600", "\n\n1600-1630",
+                                                       "\n\n1630-1700", "\n\n1700-1730"], tablefmt="pretty",
+                           colalign=("center", "left")))
+            print("\nCSV : ")
+            for i in range(len(result_list)):
+                print(result_list[i], end=", ")
+            print("\n")
+
         if option == "1":
             print(tabulate(final_result_list, headers=["Days of Week", "Venue", "\n\n0900-0930", "\n\n0930-1000",
-                                                       "\n\n1000-1030", "\n\n1030-1100", "\n\n1100-1130",
-                                                       "\n\n1130-1200",
+                                                       "\n\n1000-1030", "\n\n1030-1100", "\n\n1100-1130", "\n\n1130-1200",
                                                        "\n\n1200-1230", "Time Slots\n\n1230-1300", "\n\n1400-1430",
-                                                       "\n\n1430-1500", "\n\n1500-1530", "\n\n1530-1600",
-                                                       "\n\n1600-1630",
+                                                       "\n\n1430-1500", "\n\n1500-1530", "\n\n1530-1600", "\n\n1600-1630",
                                                        "\n\n1630-1700", "\n\n1700-1730"], tablefmt="pretty",
                            colalign=("center", "left")))
         elif option == "2":
-            print(result_list[0], end="")
-            for i in range(1, len(result_list)):
-                print(", ", result_list[i], end="")
-        print("\nFitness: ", self.population[0].fitness())
+            for i in range(len(result_list)):
+                print(result_list[i], end=", ")
+            print("\n")
+        print("Fitness: ", self.population[0].fitness())
         print("\nThe result has been saved into ", filename)
 
 
+
 # result = GeneticAlgorithm()
-cmd_dict = {"1": "result.run", "2": "exit()"}  # store functionality
+cmd_dict = {"1": "result.run", "2": "exit()", "help": None}  # store functionality
 
 
-# define our clear function
 def clear():
-    # for windows
-    if os.name == 'nt':
-        _ = os.system('cls')
-
-        # for mac and linux(here, os.name is 'posix')
-    else:
-        _ = os.system('clear')
+    os.system('cls')
 
 
 while True:
     cmds = ["\nCommand list: ",
             "              1            :   Run the Genetic Algorithm.",
-            "              2            :   Exit.\n"]
-    print("\nHi user, this is our CPT 244 Assignment 2: Presentation Scheduling Using Genetic Algorithm".center(120, '_'))
+            "              2            :   Exit.",
+            "              help         :   Show commands.\n"]
+    print("Hi user, this is our CPT 244 Assignment 2: Presentation Scheduling Using Genetic Algorithm".center(120, '_'))
     print("\n".join(cmds))
     cmdInput = input("Choose a command.\n")
     clear()
 
     if cmdInput in cmd_dict:
         if cmdInput == "1":
-            pop_size = input("\nPlease enter your desire population size. (Recommended: 300)\n")
+            pop_size = input("\nPlease enter your desire population size. (Recommended: 400)\n")
             try:
                 val = int(pop_size)
             except ValueError:
@@ -460,14 +465,13 @@ while True:
                 break
             result = eval("GeneticAlgorithm(val)")
             print("\nInitialization of Initial Population Done.")
-            
-            num_run = input("\nPlease enter your desire number of runs. (Recommended: >=300)\n")
+            num_run = input("\nPlease enter your desire number of runs. (Recommended: >=150)\n")
             try:
                 val = int(num_run)
             except ValueError:
                 print("Invalid Input.")
                 break
-            mut_rate = input("\nPlease enter your desire mutation rate. (Recommended: <=0.05)\n")
+            mut_rate = input("\nPlease enter your desire mutation rate. (Recommended: <=0.01)\n")
             try:
                 val2 = float(mut_rate)
                 if val2 < 0 or val2 > 1.0:
@@ -481,5 +485,3 @@ while True:
 
         else:
             eval(cmd_dict[cmdInput])
-    else:
-        print("\nInvalid input.")
