@@ -3,8 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="cd0bb696-e80d-4428-8fbc-733b15b16966" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/244_Assn2.py" beforeDir="false" afterPath="$PROJECT_DIR$/244_Assn2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GA_Result.csv" beforeDir="false" afterPath="$PROJECT_DIR$/GA_Result.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing.py" beforeDir="false" afterPath="$PROJECT_DIR$/testing.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,7 +35,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="settings.editor.selected.configurable" value="RainbowCSV.Settings" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.testing">
     <configuration name="244_Assn2" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="244_Assn2" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -57,8 +57,30 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="testing" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="244_Assn2" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/testing.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.testing" />
         <item itemvalue="Python.244_Assn2" />
       </list>
     </recent_temporary>
@@ -80,22 +102,22 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state width="1238" height="672" key="GridCell.Tab.0.bottom" timestamp="1590811677388">
+    <state width="1468" height="830" key="GridCell.Tab.0.bottom" timestamp="1591985424216">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
-    <state width="1238" height="672" key="GridCell.Tab.0.bottom/62.0.1474.864@62.0.1474.864" timestamp="1590811677388" />
-    <state width="1238" height="672" key="GridCell.Tab.0.center" timestamp="1590811677388">
+    <state width="1468" height="830" key="GridCell.Tab.0.bottom/62.0.1474.864@62.0.1474.864" timestamp="1591985424216" />
+    <state width="1468" height="830" key="GridCell.Tab.0.center" timestamp="1591985424216">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
-    <state width="1238" height="672" key="GridCell.Tab.0.center/62.0.1474.864@62.0.1474.864" timestamp="1590811677388" />
-    <state width="1238" height="672" key="GridCell.Tab.0.left" timestamp="1590811677388">
+    <state width="1468" height="830" key="GridCell.Tab.0.center/62.0.1474.864@62.0.1474.864" timestamp="1591985424216" />
+    <state width="1468" height="830" key="GridCell.Tab.0.left" timestamp="1591985424216">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
-    <state width="1238" height="672" key="GridCell.Tab.0.left/62.0.1474.864@62.0.1474.864" timestamp="1590811677388" />
-    <state width="1238" height="672" key="GridCell.Tab.0.right" timestamp="1590811677388">
+    <state width="1468" height="830" key="GridCell.Tab.0.left/62.0.1474.864@62.0.1474.864" timestamp="1591985424216" />
+    <state width="1468" height="830" key="GridCell.Tab.0.right" timestamp="1591985424216">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
-    <state width="1238" height="672" key="GridCell.Tab.0.right/62.0.1474.864@62.0.1474.864" timestamp="1590811677388" />
+    <state width="1468" height="830" key="GridCell.Tab.0.right/62.0.1474.864@62.0.1474.864" timestamp="1591985424216" />
     <state x="308" y="77" key="SettingsEditor" timestamp="1590574697164">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
@@ -104,5 +126,9 @@
       <screen x="62" y="0" width="1474" height="864" />
     </state>
     <state x="496" y="256" key="com.intellij.ide.util.TipDialog/62.0.1474.864@62.0.1474.864" timestamp="1589681376868" />
+    <state x="462" y="181" width="672" height="678" key="search.everywhere.popup" timestamp="1591980055065">
+      <screen x="62" y="0" width="1474" height="864" />
+    </state>
+    <state x="462" y="181" width="672" height="678" key="search.everywhere.popup/62.0.1474.864@62.0.1474.864" timestamp="1591980055065" />
   </component>
 </project>

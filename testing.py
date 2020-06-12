@@ -98,7 +98,7 @@ def venue_record_handler():  # Read all records related to venue
         for row in vu_reader:
             for data in range(1, len(row)):
                 venue_list[int(row[data]) - 1].availability = False
-                unavailable_venue_records.append(int(row[data])-1)
+                unavailable_venue_records.append(int(row[data]) - 1)
 
     return venue_list, unavailable_venue_records
 
@@ -116,6 +116,7 @@ class Candidate:
         self.SIZE = 118
         self.random_venue_list = [None] * self.SIZE
         self.staff_list = s_list
+        self.violated_constraints = []
 
         with open("SupExaAssign.csv") as SupExaAssign:
             sea_reader = csv.reader(SupExaAssign, delimiter=",")
@@ -139,6 +140,7 @@ class Candidate:
         total_fitness = 0
         venue_presentation = {}
         list_of_presentation_id = []
+        self.violated_constraints = []
 
         for i in range(self.SIZE):
             venue_presentation[self.random_venue_list[i]] = self.presentation_list[i]
@@ -150,11 +152,13 @@ class Candidate:
             # HC03 : check whether the venue is available or not
             if not presentation.assigned_venue.availability:
                 total_fitness += 1000
+                self.violated_constraints.append("HC03")
 
             for staff in presentation.staff_list:
                 # HC04 : check whether the staff is unavailable for the assigned slot
                 if presentation.assigned_venue.venue_id in staff.unavailable_slot:
                     total_fitness += 1000
+                    self.violated_constraints.append("HC04")
 
                 # HC02 : checking whether the staff exists in other presentations' staff list
                 # that is in a slot that has the same time and day
@@ -166,6 +170,7 @@ class Candidate:
                     if other_presentation and other_presentation.presentation_id != presentation.presentation_id:
                         if staff in other_presentation.staff_list:
                             total_fitness += 1000
+                            self.violated_constraints.append("HC02")
 
         attended_days = []
         for key in self.staff_list:
@@ -193,10 +198,12 @@ class Candidate:
 
                                     if consecutive_presentation < 0:
                                         total_fitness += 10
+                                        self.violated_constraints.append("SC01")
 
                                     if staff.same_venue_pref == "yes":
                                         if other_presentation.assigned_venue.venue_type != presentation.assigned_venue.venue_type:
                                             total_fitness += 10
+                                            self.violated_constraints.append("SC03")
                                 else:
                                     consecutive_presentation = staff.consecutive_presentation_pref
                             else:
@@ -208,13 +215,14 @@ class Candidate:
 
             if len(attended_days) > int(staff.attend_day):
                 total_fitness += ((len(attended_days) - int(staff.attend_day)) * 10)
+                self.violated_constraints.append("SC02")
 
         # HC01 : A presentation is scheduled more than once
         if (len(list_of_presentation_id)) > len(set(list_of_presentation_id)):
             num_of_duplicates = len(list_of_presentation_id) - len(set(list_of_presentation_id))
             total_fitness += (num_of_duplicates * 1000)
+            self.violated_constraints.append("HC01")
 
-        # print("Fitness : " + str(total_fitness))
         return total_fitness
 
     def print(self):
@@ -266,9 +274,7 @@ class GeneticAlgorithm:
             else:
                 w2 = c4
 
-            childs = self.uniform_crossover(w1, w2)
-            child1 = childs[0]
-            child2 = childs[1]
+            child1, child2 = self.uniform_crossover(w1, w2)
 
             mutate_percent = mut
             m1 = random.random() <= mutate_percent
@@ -348,33 +354,62 @@ class GeneticAlgorithm:
                     break
 
         # Assign random unexisting venue if there are still presentation without any venue.
-        for x in range(len(temp)):
-            j = random.randint(0, 299)
-            while j in obj.random_venue_list:
-                j = random.randint(0, 299)
-            obj.presentation_list[temp[x][0]].assigned_venue = self.venue_list[j]
-            obj.random_venue_list[temp[x][0]] = j
+        if len(temp) != 0:
+            for x in range(len(temp)):
+                copy = self.unavailable_slots
+                usable_venue_id = []
+                for staff in obj.presentation_list[temp[x][0]].staff_list:
+                    for index in staff.unavailable_slot:
+                        copy.append(index - 1)
 
-        for x in range(len(temp2)):
-            j = random.randint(0, 299)
-            while j in obj2.random_venue_list:
-                j = random.randint(0, 299)
-            obj2.presentation_list[temp2[x][0]].assigned_venue = self.venue_list[j]
-            obj2.random_venue_list[temp2[x][0]] = j
+                for y in range(300):
+                    if y not in obj.random_venue_list and y not in copy:
+                        usable_venue_id.append(y)
+
+                if len(usable_venue_id) != 0:
+                    j = random.choice(usable_venue_id)
+                else:
+                    j = random.randint(0, 299)
+                    while j in obj.random_venue_list:
+                        j = random.randint(0, 299)
+
+                obj.presentation_list[temp[x][0]].assigned_venue = self.venue_list[j]
+                obj.random_venue_list[temp[x][0]] = j
+
+        if len(temp2) != 0:
+            for x in range(len(temp2)):
+                copy = self.unavailable_slots
+                usable_venue_id = []
+                for staff in obj2.presentation_list[temp2[x][0]].staff_list:
+                    for index in staff.unavailable_slot:
+                        copy.append(index - 1)
+
+                for y in range(300):
+                    if y not in obj2.random_venue_list and y not in copy:
+                        usable_venue_id.append(y)
+
+                if len(usable_venue_id) != 0:
+                    j = random.choice(usable_venue_id)
+                else:
+                    j = random.randint(0, 299)
+                    while j in obj2.random_venue_list:
+                        j = random.randint(0, 299)
+                obj2.presentation_list[temp2[x][0]].assigned_venue = self.venue_list[j]
+                obj2.random_venue_list[temp2[x][0]] = j
 
         return obj, obj2
 
     def mutate(self, obj):
         i = random.randint(0, obj.SIZE - 1)
 
-        # records the unavaliable slots of staffs and venues into copy
+        # records the unavailable slots of staffs and venues into copy
         copy = self.unavailable_slots
         usable_venue_id = []
         for staff in obj.presentation_list[i].staff_list:
             for index in staff.unavailable_slot:
-                copy.append(index-1)
+                copy.append(index - 1)
 
-        for x in range(0,299):
+        for x in range(300):
             if x not in obj.random_venue_list and x not in copy:
                 usable_venue_id.append(x)
 
@@ -382,7 +417,7 @@ class GeneticAlgorithm:
             j = random.choice(usable_venue_id)
         else:
             j = random.randint(0, 299)
-            while j in obj.random_venue_list or j in self.unavailable_slots:
+            while j in obj.random_venue_list:
                 j = random.randint(0, 299)
         obj.random_venue_list[i] = j  # Update the venue occupied by the chosen presentation
         obj.presentation_list[i].assigned_venue = self.venue_list[j]  # Update new venue for chosen presentation
@@ -400,7 +435,7 @@ class GeneticAlgorithm:
 
     def print_result(self):
         print("\nDone!!!")
-            
+
         result_list = ["null"] * 300
         final_result_list = []
         filename = "GA_Result.csv"
@@ -456,6 +491,7 @@ class GeneticAlgorithm:
                 print(", ", result_list[i], end="")
 
         print("\n\nFitness: ", self.population[0].fitness())
+        print("\nViolated Constraints", self.population[0].violated_constraints)
         print("\nThe result has been saved into ", filename)
 
 
@@ -478,7 +514,8 @@ while True:
     cmds = ["\nCommand list: ",
             "              1            :   Run the Genetic Algorithm.",
             "              2            :   Exit.\n"]
-    print("\nHi user, this is our CPT 244 Assignment 2: Presentation Scheduling Using Genetic Algorithm".center(120, '_'))
+    print(
+        "\nHi user, this is our CPT 244 Assignment 2: Presentation Scheduling Using Genetic Algorithm".center(120, '_'))
     print("\n".join(cmds))
     cmdInput = input("Choose a command.\n")
     clear()
@@ -493,7 +530,7 @@ while True:
                 break
             result = eval("GeneticAlgorithm(val)")
             print("\nInitialization of Initial Population Done.")
-            
+
             num_run = input("\nPlease enter your desire number of runs. (Recommended: >=300)\n")
             try:
                 val = int(num_run)
