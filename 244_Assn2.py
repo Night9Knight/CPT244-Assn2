@@ -443,7 +443,6 @@ class GeneticAlgorithm:
         print("\nThe result has been saved into ", filename)
 
 
-# result = GeneticAlgorithm()
 cmd_dict = {"1": "result.run", "2": "exit()"}  # store functionality
 
 
