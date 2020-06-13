@@ -87,8 +87,8 @@ def venue_record_handler():  # Read all records related to venue
             if i - w * 60 == 60:
                 w += 1
 
-        new_venue.day = int((i - 1) / 60)  # stores the day as int (Mon - Fri : 0 - 4)
-        new_venue.time = int((i - 1) % 15)  # stores the time as int (0900-0930.....1700-1730: 0.....14)
+        new_venue.day = (i - 1) / 60  # stores the day as int (Mon - Fri : 0 - 4)
+        new_venue.time = (i - 1) % 15  # stores the time as int (0900-0930.....1700-1730: 0.....14)
 
         venue_list.append(new_venue)
 
@@ -173,13 +173,11 @@ class Candidate:
                             self.violated_constraints.append("HC02")
 
         attended_days = []
-        present = []
         for key in self.staff_list:
             staff = self.staff_list.get(key)
             attended_days.clear()
-            present.clear()
             consecutive_presentation = staff.consecutive_presentation_pref
-            #other_presentation = None
+            other_presentation = None
 
             for presentation in self.presentation_list:
 
@@ -214,19 +212,16 @@ class Candidate:
                     # SC02 : check whether the number of presentation days exceed the number of prefered days of the staff
                     if presentation.assigned_venue.day not in attended_days:
                         attended_days.append(presentation.assigned_venue.day)
-                        present.append(presentation.presentation_id)
 
             if len(attended_days) > int(staff.attend_day):
                 total_fitness += ((len(attended_days) - int(staff.attend_day)) * 10)
-
-                self.violated_constraints.append("SC02 * "+str((len(attended_days) - int(staff.attend_day)))+" " +
-                                                 str(staff.staff_id) +" "+str(present)+ " " + str(attended_days))
+                self.violated_constraints.append("SC02")
 
         # HC01 : A presentation is scheduled more than once
         if (len(list_of_presentation_id)) > len(set(list_of_presentation_id)):
             num_of_duplicates = len(list_of_presentation_id) - len(set(list_of_presentation_id))
             total_fitness += (num_of_duplicates * 1000)
-            self.violated_constraints.append("HC01 * " + str(num_of_duplicates))
+            self.violated_constraints.append("HC01")
 
         return total_fitness
 
@@ -361,37 +356,44 @@ class GeneticAlgorithm:
         # Assign random unexisting venue if there are still presentation without any venue.
         if len(temp) != 0:
             for x in range(len(temp)):
-                # find time slots that won't cause HC violation
-                usable_venue_id = [x for x in range(300) if x not in (obj.random_venue_list or self.unavailable_slots)]
-
-                staff_unavailable_slots = []
+                copy = self.unavailable_slots
+                usable_venue_id = []
                 for staff in obj.presentation_list[temp[x][0]].staff_list:
-                    staff_unavailable_slots += staff.unavailable_slot
+                    for index in staff.unavailable_slot:
+                        copy.append(index - 1)
 
-                for slot in staff_unavailable_slots:
-                    if slot in usable_venue_id:
-                        usable_venue_id.remove(slot)
+                for y in range(300):
+                    if y not in obj.random_venue_list and y not in copy:
+                        usable_venue_id.append(y)
 
-                j = random.choice(usable_venue_id)
+                if len(usable_venue_id) != 0:
+                    j = random.choice(usable_venue_id)
+                else:
+                    j = random.randint(0, 299)
+                    while j in obj.random_venue_list:
+                        j = random.randint(0, 299)
 
                 obj.presentation_list[temp[x][0]].assigned_venue = self.venue_list[j]
                 obj.random_venue_list[temp[x][0]] = j
 
         if len(temp2) != 0:
             for x in range(len(temp2)):
-                # find time slots that won't cause HC violation
-                usable_venue_id = [x for x in range(300) if x not in (obj2.random_venue_list or self.unavailable_slots)]
-
-                staff_unavailable_slots = []
+                copy = self.unavailable_slots
+                usable_venue_id = []
                 for staff in obj2.presentation_list[temp2[x][0]].staff_list:
-                    staff_unavailable_slots += staff.unavailable_slot
+                    for index in staff.unavailable_slot:
+                        copy.append(index - 1)
 
-                for slot in staff_unavailable_slots:
-                    if slot in usable_venue_id:
-                        usable_venue_id.remove(slot)
+                for y in range(300):
+                    if y not in obj2.random_venue_list and y not in copy:
+                        usable_venue_id.append(y)
 
-                j = random.choice(usable_venue_id)
-
+                if len(usable_venue_id) != 0:
+                    j = random.choice(usable_venue_id)
+                else:
+                    j = random.randint(0, 299)
+                    while j in obj2.random_venue_list:
+                        j = random.randint(0, 299)
                 obj2.presentation_list[temp2[x][0]].assigned_venue = self.venue_list[j]
                 obj2.random_venue_list[temp2[x][0]] = j
 
@@ -400,18 +402,23 @@ class GeneticAlgorithm:
     def mutate(self, obj):
         i = random.randint(0, obj.SIZE - 1)
 
-        # find time slots that won't cause HC violation
-        usable_venue_id = [x for x in range(300) if x not in (obj.random_venue_list or self.unavailable_slots)]
-
-        staff_unavailable_slots = []
+        # records the unavailable slots of staffs and venues into copy
+        copy = self.unavailable_slots
+        usable_venue_id = []
         for staff in obj.presentation_list[i].staff_list:
-            staff_unavailable_slots += staff.unavailable_slot
+            for index in staff.unavailable_slot:
+                copy.append(index - 1)
 
-        for slot in staff_unavailable_slots:
-            if slot in usable_venue_id:
-                usable_venue_id.remove(slot)
+        for x in range(300):
+            if x not in obj.random_venue_list and x not in copy:
+                usable_venue_id.append(x)
 
-        j = random.choice(usable_venue_id)
+        if len(usable_venue_id) != 0:
+            j = random.choice(usable_venue_id)
+        else:
+            j = random.randint(0, 299)
+            while j in obj.random_venue_list:
+                j = random.randint(0, 299)
         obj.random_venue_list[i] = j  # Update the venue occupied by the chosen presentation
         obj.presentation_list[i].assigned_venue = self.venue_list[j]  # Update new venue for chosen presentation
 
