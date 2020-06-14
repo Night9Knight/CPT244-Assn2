@@ -475,7 +475,6 @@ class GeneticAlgorithm:
         print("\nThe result has been saved into ", filename)
 
 
-# result = GeneticAlgorithm()
 cmd_dict = {"1": "result.run", "2": "exit()"}  # store functionality
 
 
@@ -502,7 +501,7 @@ while True:
 
     if cmdInput in cmd_dict:
         if cmdInput == "1":
-            pop_size = input("\nPlease enter your desire population size. (Recommended: 300)\n")
+            pop_size = input("\nPlease enter your desire population size. (Recommended: 100-300)\n")
             try:
                 val = int(pop_size)
             except ValueError:
@@ -517,7 +516,7 @@ while True:
             except ValueError:
                 print("Invalid Input.")
                 break
-            mut_rate = input("\nPlease enter your desire mutation rate. (Recommended: <=0.05)\n")
+            mut_rate = input("\nPlease enter your desire mutation rate. (Recommended: 0.15)\n")
             try:
                 val2 = float(mut_rate)
                 if val2 < 0 or val2 > 1.0:

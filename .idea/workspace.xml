@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="cd0bb696-e80d-4428-8fbc-733b15b16966" name="Default Changelist" comment="" />
+    <list default="true" id="cd0bb696-e80d-4428-8fbc-733b15b16966" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/244_Assn2.py" beforeDir="false" afterPath="$PROJECT_DIR$/244_Assn2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA_Result.csv" beforeDir="false" afterPath="$PROJECT_DIR$/GA_Result.csv" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -31,7 +35,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
-  <component name="RunManager" selected="Python.test2">
+  <component name="RunManager" selected="Python.244_Assn2">
     <configuration name="244_Assn2" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="244_Assn2" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -76,8 +80,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.test2" />
         <item itemvalue="Python.244_Assn2" />
+        <item itemvalue="Python.test2" />
       </list>
     </recent_temporary>
   </component>
@@ -92,28 +96,42 @@
       <option name="presentableId" value="Default" />
       <updated>1589470389442</updated>
     </task>
+    <task id="LOCAL-00001" summary="Cleared unnecessary lines">
+      <created>1592100397207</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1592100397207</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="Cleared unnecessary lines" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleared unnecessary lines" />
   </component>
   <component name="WindowStateProjectService">
-    <state width="1453" height="277" key="GridCell.Tab.0.bottom" timestamp="1592037384770">
+    <state x="426" y="1" key="CommitChangelistDialog2" timestamp="1592100396545">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
-    <state width="1453" height="277" key="GridCell.Tab.0.bottom/62.0.1474.864@62.0.1474.864" timestamp="1592037384770" />
-    <state width="1453" height="277" key="GridCell.Tab.0.center" timestamp="1592037384770">
+    <state x="426" y="1" key="CommitChangelistDialog2/62.0.1474.864@62.0.1474.864" timestamp="1592100396545" />
+    <state width="1468" height="830" key="GridCell.Tab.0.bottom" timestamp="1592105372344">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
-    <state width="1453" height="277" key="GridCell.Tab.0.center/62.0.1474.864@62.0.1474.864" timestamp="1592037384770" />
-    <state width="1453" height="277" key="GridCell.Tab.0.left" timestamp="1592037384770">
+    <state width="1468" height="830" key="GridCell.Tab.0.bottom/62.0.1474.864@62.0.1474.864" timestamp="1592105372344" />
+    <state width="1468" height="830" key="GridCell.Tab.0.center" timestamp="1592105372344">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
-    <state width="1453" height="277" key="GridCell.Tab.0.left/62.0.1474.864@62.0.1474.864" timestamp="1592037384770" />
-    <state width="1453" height="277" key="GridCell.Tab.0.right" timestamp="1592037384770">
+    <state width="1468" height="830" key="GridCell.Tab.0.center/62.0.1474.864@62.0.1474.864" timestamp="1592105372344" />
+    <state width="1468" height="830" key="GridCell.Tab.0.left" timestamp="1592105372344">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
-    <state width="1453" height="277" key="GridCell.Tab.0.right/62.0.1474.864@62.0.1474.864" timestamp="1592037384770" />
+    <state width="1468" height="830" key="GridCell.Tab.0.left/62.0.1474.864@62.0.1474.864" timestamp="1592105372344" />
+    <state width="1468" height="830" key="GridCell.Tab.0.right" timestamp="1592105372344">
+      <screen x="62" y="0" width="1474" height="864" />
+    </state>
+    <state width="1468" height="830" key="GridCell.Tab.0.right/62.0.1474.864@62.0.1474.864" timestamp="1592105372344" />
     <state width="1453" height="277" key="GridCell.Tab.1.bottom" timestamp="1592037384770">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
@@ -130,10 +148,14 @@
       <screen x="62" y="0" width="1474" height="864" />
     </state>
     <state width="1453" height="277" key="GridCell.Tab.1.right/62.0.1474.864@62.0.1474.864" timestamp="1592037384770" />
-    <state x="308" y="77" key="SettingsEditor" timestamp="1592037260488">
+    <state x="308" y="77" key="SettingsEditor" timestamp="1592105088922">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
-    <state x="308" y="77" key="SettingsEditor/62.0.1474.864@62.0.1474.864" timestamp="1592037260488" />
+    <state x="308" y="77" key="SettingsEditor/62.0.1474.864@62.0.1474.864" timestamp="1592105088922" />
+    <state x="392" y="165" key="Vcs.Push.Dialog.v2" timestamp="1592100401062">
+      <screen x="62" y="0" width="1474" height="864" />
+    </state>
+    <state x="392" y="165" key="Vcs.Push.Dialog.v2/62.0.1474.864@62.0.1474.864" timestamp="1592100401062" />
     <state x="496" y="256" key="com.intellij.ide.util.TipDialog" timestamp="1589681376868">
       <screen x="62" y="0" width="1474" height="864" />
     </state>
