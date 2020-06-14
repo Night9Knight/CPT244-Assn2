@@ -116,7 +116,6 @@ class Candidate:
         self.SIZE = 118
         self.random_venue_list = [None] * self.SIZE
         self.staff_list = s_list
-        self.violated_constraints = []
 
         with open("SupExaAssign.csv") as SupExaAssign:
             sea_reader = csv.reader(SupExaAssign, delimiter=",")
@@ -140,7 +139,6 @@ class Candidate:
         total_fitness = 0
         venue_presentation = {}
         list_of_presentation_id = []
-        self.violated_constraints = []
 
         for i in range(self.SIZE):
             venue_presentation[self.random_venue_list[i]] = self.presentation_list[i]
@@ -152,13 +150,11 @@ class Candidate:
             # HC03 : check whether the venue is available or not
             if not presentation.assigned_venue.availability:
                 total_fitness += 1000
-                self.violated_constraints.append("HC03")
 
             for staff in presentation.staff_list:
                 # HC04 : check whether the staff is unavailable for the assigned slot
                 if presentation.assigned_venue.venue_id in staff.unavailable_slot:
                     total_fitness += 1000
-                    self.violated_constraints.append("HC04")
 
                 # HC02 : checking whether the staff exists in other presentations' staff list
                 # that is in a slot that has the same time and day
@@ -170,7 +166,6 @@ class Candidate:
                     if other_presentation and other_presentation.presentation_id != presentation.presentation_id:
                         if staff in other_presentation.staff_list:
                             total_fitness += 1000
-                            self.violated_constraints.append("HC02")
 
         attended_days = []
         present = []
@@ -179,14 +174,13 @@ class Candidate:
             attended_days.clear()
             present.clear()
             consecutive_presentation = staff.consecutive_presentation_pref
-            #other_presentation = None
 
             for presentation in self.presentation_list:
 
                 if staff in presentation.staff_list:
                     # SC01 and SC03
                     if presentation.assigned_venue.time != 0:  # presentation is not the first one for the day
-                        # stores the modulus 15 value of timeslot of the previous venue id
+                        # stores the modulus 15 value of time slot of the previous venue id
                         previous_time_slot = presentation.assigned_venue.time - 1
                         for i in range(4):
                             # get all presentations that uses the time slot before the current presentation
@@ -200,12 +194,10 @@ class Candidate:
 
                                     if consecutive_presentation < 0:
                                         total_fitness += 10
-                                        self.violated_constraints.append("SC01")
 
                                     if staff.same_venue_pref == "yes":
                                         if other_presentation.assigned_venue.venue_type != presentation.assigned_venue.venue_type:
                                             total_fitness += 10
-                                            self.violated_constraints.append("SC03")
                                 else:
                                     consecutive_presentation = staff.consecutive_presentation_pref
                             else:
@@ -219,14 +211,10 @@ class Candidate:
             if len(attended_days) > int(staff.attend_day):
                 total_fitness += ((len(attended_days) - int(staff.attend_day)) * 10)
 
-                self.violated_constraints.append("SC02 * "+str((len(attended_days) - int(staff.attend_day)))+" " +
-                                                 str(staff.staff_id) +" "+str(present)+ " " + str(attended_days))
-
         # HC01 : A presentation is scheduled more than once
         if (len(list_of_presentation_id)) > len(set(list_of_presentation_id)):
             num_of_duplicates = len(list_of_presentation_id) - len(set(list_of_presentation_id))
             total_fitness += (num_of_duplicates * 1000)
-            self.violated_constraints.append("HC01 * " + str(num_of_duplicates))
 
         return total_fitness
 
@@ -484,7 +472,6 @@ class GeneticAlgorithm:
                 print(", ", result_list[i], end="")
 
         print("\n\nFitness: ", self.population[0].fitness())
-        print("\nViolated Constraints", self.population[0].violated_constraints)
         print("\nThe result has been saved into ", filename)
 
 
